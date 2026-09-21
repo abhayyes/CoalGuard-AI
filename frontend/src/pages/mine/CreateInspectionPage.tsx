@@ -5,11 +5,15 @@ import {
   ArrowRight,
   ArrowLeft,
   MapPin,
+  ClipboardCheck,
+  ShieldAlert,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 import { useMineStore } from '../../stores/mineStore';
-import { Button } from '../../components/ui/Button';
-import { Card, CardContent } from '../../components/ui/Card';
+
+const inputCls = "w-full text-xs px-3.5 py-2.5 rounded-xl text-coal placeholder:text-slate-300 transition-all duration-150 focus:outline-none";
+const inputStyle = { background: 'rgba(253,248,251,0.7)', border: '1px solid rgba(255,192,203,0.25)', color: '#0a0a0a' };
 
 export const CreateInspectionPage: React.FC = () => {
   const navigate = useNavigate();
@@ -98,225 +102,262 @@ export const CreateInspectionPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Conduct Mine Inspection</h1>
-        <p className="text-xs font-medium text-slate-500 mt-1">
-          Step {step} of 3: {step === 1 ? 'Inspection Details' : step === 2 ? 'Safety Checklist' : 'Log Observations & Submit'}
+    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="animate-fade-in-up">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(to bottom, #FFC0CB, #F9B8C3)' }} />
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Field Audit Workflow</span>
+        </div>
+        <h1 className="text-2xl font-black text-coal tracking-tight">Conduct Mine Inspection</h1>
+        <p className="text-xs text-slate-400 mt-1 font-medium">
+          Step {step} of 3: {step === 1 ? 'Inspection Details & Geolocation' : step === 2 ? 'DGMS Safety Checklist' : 'Log Observations & Submit'}
         </p>
       </div>
 
       {/* Steps Progress Indicator */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-4 text-xs font-semibold">
-        <span className={step === 1 ? 'text-[#1E3A5F] border-b-2 border-[#1E3A5F] pb-1' : 'text-slate-400'}>
-          1. Basic Details
-        </span>
-        <span className={step === 2 ? 'text-[#1E3A5F] border-b-2 border-[#1E3A5F] pb-1' : 'text-slate-400'}>
-          2. Mandatory Checklist
-        </span>
-        <span className={step === 3 ? 'text-[#1E3A5F] border-b-2 border-[#1E3A5F] pb-1' : 'text-slate-400'}>
-          3. Observations & Review
-        </span>
+      <div className="flex items-center justify-between p-4 rounded-2xl animate-fade-in-up"
+        style={{ background: 'rgba(253,248,251,0.9)', border: '1px solid rgba(255,192,203,0.2)' }}>
+        {[
+          { num: 1, title: 'Details & GPS', icon: FileSpreadsheet },
+          { num: 2, title: 'Checklist', icon: ClipboardCheck },
+          { num: 3, title: 'Observations', icon: ShieldAlert },
+        ].map((s) => {
+          const Icon = s.icon;
+          const isActive = step === s.num;
+          const isDone = step > s.num;
+          return (
+            <div key={s.num} className="flex items-center gap-2">
+              <div
+                className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs transition-all duration-200 ${
+                  isActive
+                    ? 'text-coal shadow-pink-sm scale-105'
+                    : isDone
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-slate-100 text-slate-400'
+                }`}
+                style={isActive ? { background: 'linear-gradient(135deg, #FFC0CB, #FFD6DC)' } : {}}
+              >
+                {isDone ? <CheckCircle2 className="w-4 h-4" /> : s.num}
+              </div>
+              <span className={`text-xs font-bold ${isActive ? 'text-coal' : 'text-slate-400'}`}>
+                {s.title}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          {step === 1 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                  Inspection Category
-                </label>
-                <select
-                  value={inspectionType}
-                  onChange={(e) => setInspectionType(e.target.value)}
-                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
+      {/* Step Container Card */}
+      <div
+        className="rounded-3xl p-6 sm:p-8 animate-fade-in-up"
+        style={{
+          background: 'rgba(253,248,251,0.98)',
+          border: '1px solid rgba(255,192,203,0.25)',
+          boxShadow: '0 8px 32px rgba(255,192,203,0.08)'
+        }}
+      >
+        {step === 1 && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inspection Category</label>
+              <select
+                value={inspectionType}
+                onChange={(e) => setInspectionType(e.target.value)}
+                className={inputCls} style={inputStyle}
+              >
+                <option value="safety">Statutory Safety Audit</option>
+                <option value="routine">Routine Pit Inspection</option>
+                <option value="environmental">Environmental Compliance Audit</option>
+                <option value="special">Special DGMS Directed Audit</option>
+                <option value="follow_up">Corrective Action Follow-up</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inspection Date</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className={inputCls} style={inputStyle}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Summary / Scope of Inspection</label>
+              <textarea
+                rows={3}
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="e.g. Auditing haul road conditions, slope stability, and heavy earthmoving machinery safety."
+                className={inputCls} style={inputStyle}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GPS Latitude</label>
+                <input
+                  type="text"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  className={inputCls} style={inputStyle}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GPS Longitude</label>
+                <input
+                  type="text"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  className={inputCls} style={inputStyle}
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={captureGPS}
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl transition-all duration-150"
+              style={{ background: 'rgba(255,192,203,0.15)', color: '#C08090' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,192,203,0.25)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,192,203,0.15)')}
+            >
+              <MapPin className="w-3.5 h-3.5" /> Auto-Capture Geo-Location
+            </button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-4 animate-fade-in">
+            <div>
+              <h3 className="text-sm font-black text-coal">DGMS Safety Standards Verification</h3>
+              <p className="text-[11px] text-slate-400 mt-0.5">Mark verification criteria as Pass, Fail, or N/A</p>
+            </div>
+
+            <div className="space-y-2.5">
+              {checklist.map((c) => (
+                <div
+                  key={c.id}
+                  className="p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-150"
+                  style={{ background: 'rgba(255,192,203,0.06)', border: '1px solid rgba(255,192,203,0.15)' }}
                 >
-                  <option value="safety">Statutory Safety Audit</option>
-                  <option value="routine">Routine Pit Inspection</option>
-                  <option value="environmental">Environmental Compliance Audit</option>
-                  <option value="special">Special DGMS Directed Audit</option>
-                  <option value="follow_up">Corrective Action Follow-up</option>
+                  <span className="text-xs font-bold text-coal flex-1">{c.item}</span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {['pass', 'fail', 'na'].map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        onClick={() => handleChecklistChange(c.id, status)}
+                        className={`text-[10px] uppercase font-black px-3 py-1.5 rounded-xl transition-all duration-150 ${
+                          c.status === status
+                            ? status === 'pass'
+                              ? 'bg-emerald-600 text-white shadow-sm'
+                              : status === 'fail'
+                              ? 'bg-red-500 text-white shadow-sm'
+                              : 'bg-slate-700 text-white shadow-sm'
+                            : 'bg-white/80 border border-slate-200 text-slate-600 hover:bg-white'
+                        }`}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-4 animate-fade-in">
+            <div>
+              <h3 className="text-sm font-black text-coal">Record Identified Safety Hazards</h3>
+              <p className="text-[11px] text-slate-400 mt-0.5">Optional hazard log attached to this inspection audit</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Observation / Defect Description</label>
+              <textarea
+                rows={3}
+                value={obsDescription}
+                onChange={(e) => setObsDescription(e.target.value)}
+                placeholder="e.g. Inadequate berm height (<1.5m) observed along 200m haul road curve near Dump-3."
+                className={inputCls} style={inputStyle}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hazard Severity</label>
+                <select
+                  value={obsSeverity}
+                  onChange={(e) => setObsSeverity(e.target.value)}
+                  className={inputCls} style={inputStyle}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High (48h Escalation)</option>
+                  <option value="critical">Critical (Immediate Stop-Work)</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                  Inspection Date
-                </label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                  Summary / Scope of Inspection
-                </label>
-                <textarea
-                  rows={3}
-                  value={summary}
-                  onChange={(e) => setSummary(e.target.value)}
-                  placeholder="e.g. Auditing haul road conditions, slope stability, and heavy earthmoving machinery safety."
-                  className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    GPS Latitude
-                  </label>
-                  <input
-                    type="text"
-                    value={latitude}
-                    onChange={(e) => setLatitude(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    GPS Longitude
-                  </label>
-                  <input
-                    type="text"
-                    value={longitude}
-                    onChange={(e) => setLongitude(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <Button type="button" variant="outline" size="sm" onClick={captureGPS} className="gap-2">
-                <MapPin className="w-3.5 h-3.5" /> Auto-Capture Geo-Location
-              </Button>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 mb-2">DGMS Safety Standards Verification</h3>
-              <div className="space-y-3">
-                {checklist.map((c) => (
-                  <div key={c.id} className="p-3 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between gap-4">
-                    <span className="text-xs text-slate-800 font-medium">{c.item}</span>
-                    <div className="flex items-center gap-1">
-                      {['pass', 'fail', 'na'].map((status) => (
-                        <button
-                          key={status}
-                          type="button"
-                          onClick={() => handleChecklistChange(c.id, status)}
-                          className={`text-[11px] uppercase font-semibold px-2.5 py-1 rounded transition-colors ${
-                            c.status === status
-                              ? status === 'pass'
-                                ? 'bg-emerald-600 text-white'
-                                : status === 'fail'
-                                ? 'bg-red-600 text-white'
-                                : 'bg-slate-700 text-white'
-                              : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                          }`}
-                        >
-                          {status}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Category</label>
+                <select
+                  value={obsCategory}
+                  onChange={(e) => setObsCategory(e.target.value)}
+                  className={inputCls} style={inputStyle}
+                >
+                  <option value="safety">Safety</option>
+                  <option value="structural">Structural Stability</option>
+                  <option value="equipment">Heavy Machinery</option>
+                  <option value="environmental">Environmental</option>
+                  <option value="procedural">Procedural / Standard</option>
+                </select>
               </div>
             </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 mb-2">Record Identified Safety Hazards</h3>
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                  Observation / Defect Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={obsDescription}
-                  onChange={(e) => setObsDescription(e.target.value)}
-                  placeholder="e.g. Inadequate berm height (<1.5m) observed along 200m haul road curve near Dump-3."
-                  className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Hazard Severity
-                  </label>
-                  <select
-                    value={obsSeverity}
-                    onChange={(e) => setObsSeverity(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High (48h Escalation)</option>
-                    <option value="critical">Critical (Immediate Stop-Work)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={obsCategory}
-                    onChange={(e) => setObsCategory(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  >
-                    <option value="safety">Safety</option>
-                    <option value="structural">Structural Stability</option>
-                    <option value="equipment">Heavy Machinery</option>
-                    <option value="environmental">Environmental</option>
-                    <option value="procedural">Procedural / Standard</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
-            {step > 1 ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setStep((s) => s - 1)}
-                className="gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back
-              </Button>
-            ) : (
-              <div></div>
-            )}
-
-            {step < 3 ? (
-              <Button
-                type="button"
-                onClick={() => setStep((s) => s + 1)}
-                className="gap-2"
-              >
-                Continue <ArrowRight className="w-4 h-4" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                isLoading={isLoading}
-                className="bg-emerald-600 hover:bg-emerald-700 gap-2"
-              >
-                <CheckCircle2 className="w-4 h-4" /> Submit Inspection Record
-              </Button>
-            )}
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-between pt-6 mt-6 border-t" style={{ borderColor: 'rgba(255,192,203,0.2)' }}>
+          {step > 1 ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => s - 1)}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 transition-all duration-150 hover:-translate-y-0.5"
+              style={{ border: '1px solid rgba(255,192,203,0.25)' }}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Back
+            </button>
+          ) : (
+            <div />
+          )}
+
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => s + 1)}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-black text-coal transition-all duration-150 hover:shadow-pink-md hover:-translate-y-0.5 active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg, #FFC0CB, #FFD6DC)', boxShadow: '0 4px 14px rgba(255,192,203,0.4)' }}
+            >
+              Continue <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-black text-white transition-all duration-150 active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg, #10B981, #059669)', boxShadow: '0 4px 14px rgba(16,185,129,0.3)' }}
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              {isLoading ? 'Submitting...' : 'Submit Inspection Record'}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

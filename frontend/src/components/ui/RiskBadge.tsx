@@ -12,22 +12,19 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({ level, className }) => {
 
   const normalized = level.toLowerCase();
 
-  const styles = {
-    low: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    medium: 'bg-amber-100 text-amber-800 border-amber-200',
-    high: 'bg-orange-100 text-orange-800 border-orange-200',
-    critical: 'bg-purple-100 text-purple-800 border-purple-200 font-semibold',
+  const configs: Record<string, { bg: string; text: string; border: string }> = {
+    low:      { bg: 'rgba(16,185,129,0.08)', text: '#047857', border: 'rgba(16,185,129,0.25)' },
+    medium:   { bg: 'rgba(245,158,11,0.08)', text: '#B45309', border: 'rgba(245,158,11,0.25)' },
+    high:     { bg: 'rgba(239,100,50,0.1)',  text: '#C2410C', border: 'rgba(239,100,50,0.25)' },
+    critical: { bg: 'rgba(124,58,237,0.1)',  text: '#6D28D9', border: 'rgba(124,58,237,0.3)' },
   };
 
-  const currentStyle = styles[normalized as keyof typeof styles] || 'bg-slate-100 text-slate-800 border-slate-200';
+  const cfg = configs[normalized] ?? { bg: 'rgba(148,163,184,0.08)', text: '#475569', border: 'rgba(148,163,184,0.2)' };
 
   return (
     <span
-      className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border uppercase tracking-wider',
-        currentStyle,
-        className
-      )}
+      className={cn('inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest', className)}
+      style={{ background: cfg.bg, color: cfg.text, border: `1px solid ${cfg.border}` }}
     >
       {level}
     </span>
