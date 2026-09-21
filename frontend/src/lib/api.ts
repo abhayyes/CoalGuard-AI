@@ -10,9 +10,11 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(async (config) => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.access_token) {
-      config.headers.Authorization = `Bearer ${session.access_token}`;
+    if (import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder-supabase.supabase.co') {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        config.headers.Authorization = `Bearer ${session.access_token}`;
+      }
     }
   } catch (err) {
     console.warn('Could not attach auth session to request:', err);
