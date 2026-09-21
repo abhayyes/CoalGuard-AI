@@ -90,7 +90,7 @@ export const MineDashboardPage: React.FC = () => {
       setAiReport(data);
     } catch (error) {
       console.error('AI Analysis failed:', error);
-      setAiReport({ error: 'Failed to generate AI report' });
+      setAiReport({ error: Analysis Failed:  + (error.response?.data?.detail || error.message || 'Unknown Error') });
     }
     setIsAnalyzing(false);
   };

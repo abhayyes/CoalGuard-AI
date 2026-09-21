@@ -52,7 +52,7 @@ export const AlertsPage: React.FC = () => {
       setAiReport(data);
     } catch (error) {
       console.error('AI Scan failed:', error);
-      setAiReport({ error: 'Failed to run AI Anomaly Scan' });
+      setAiReport({ error: Scan Failed:  + (error.response?.data?.detail || error.message || 'Unknown Error') });
     }
     setIsScanning(false);
   };
