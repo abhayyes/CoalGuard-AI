@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Clock, Plus, ShieldCheck } from 'lucide-react';
+import { Users, Clock, Plus, ShieldCheck, X } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 import { useMineStore } from '../../stores/mineStore';
 import { Contractor } from '../../types';
-import { Card, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
 import { formatDate } from '../../lib/utils';
+
+const inputCls = "w-full text-xs px-3.5 py-2.5 rounded-xl text-coal placeholder:text-slate-300 transition-all duration-150 focus:outline-none";
+const inputStyle = { background: 'rgba(253,248,251,0.7)', border: '1px solid rgba(255,192,203,0.25)', color: '#0a0a0a' };
 
 export const ContractorsPage: React.FC = () => {
   const { selectedMine } = useMineStore();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Form State
   const [name, setName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
@@ -25,210 +25,190 @@ export const ContractorsPage: React.FC = () => {
       const mineParam = selectedMine ? `?mine_id=${selectedMine.id}` : '';
       const res = await apiClient.get(`/contractors${mineParam}`);
       setContractors(res.data.data || []);
-    } catch (err) {
-      console.error('Error fetching contractors:', err);
-    }
+    } catch { setContractors([]); }
   };
 
-  useEffect(() => {
-    fetchContractors();
-  }, [selectedMine]);
+  useEffect(() => { fetchContractors(); }, [selectedMine]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedMine) {
-      alert('Please select a mine in the top bar.');
-      return;
-    }
-
+    if (!selectedMine) { alert('Please select a mine first.'); return; }
     try {
       await apiClient.post('/contractors', {
-        mine_id: selectedMine.id,
-        name,
-        company_name: companyName,
-        license_number: licenseNumber,
-        valid_until: validUntil,
-        workers_count: Number(workersCount),
-        safety_score: Number(safetyScore),
-        status: 'active',
+        mine_id: selectedMine.id, name, company_name: companyName,
+        license_number: licenseNumber, valid_until: validUntil,
+        workers_count: Number(workersCount), safety_score: Number(safetyScore), status: 'active',
       });
       setIsModalOpen(false);
-      setName('');
-      setCompanyName('');
-      setLicenseNumber('');
-      setValidUntil('');
+      setName(''); setCompanyName(''); setLicenseNumber(''); setValidUntil('');
       fetchContractors();
-    } catch (err: any) {
-      alert(err.response?.data?.detail || 'Failed to add contractor');
-    }
+    } catch (err: any) { alert(err.response?.data?.detail || 'Failed to add contractor'); }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 animate-fade-in-up">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Contractor Safety & Compliance</h1>
-          <p className="text-xs font-medium text-slate-500 mt-1">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-1.5 h-5 rounded-full" style={{ background: 'linear-gradient(to bottom, #FFC0CB, #F9B8C3)' }} />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mine Operations</span>
+          </div>
+          <h1 className="text-2xl font-black text-coal tracking-tight">Contractor Safety &amp; Compliance</h1>
+          <p className="text-xs text-slate-400 mt-1 font-medium flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Track outsourced manpower agencies, DGMS statutory licenses, and safety scores
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-coal transition-all duration-200 hover:shadow-pink-md hover:-translate-y-0.5 active:scale-[0.98]"
+          style={{ background: 'linear-gradient(135deg, #FFC0CB, #FFD6DC)', boxShadow: '0 4px 16px rgba(255,192,203,0.4)' }}
+        >
+          <Plus className="w-3.5 h-3.5" />
           Add Contractor Agency
-        </Button>
+        </button>
       </div>
 
+      {/* Cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {contractors.length > 0 ? (
-          contractors.map((c) => (
-            <Card key={c.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5 space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">{c.company_name || c.name}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">License: {c.license_number || 'DGMS/REG/2026'}</p>
-                  </div>
-                  <span
-                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                      c.status === 'active'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-red-50 text-red-700'
-                    }`}
-                  >
-                    {c.status}
+          contractors.map((c, i) => (
+            <div
+              key={c.id}
+              className="group rounded-2xl p-5 space-y-4 transition-all duration-200 animate-fade-in-up hover:-translate-y-1"
+              style={{
+                animationDelay: `${i * 60}ms`,
+                background: 'rgba(253,248,251,0.9)',
+                border: '1px solid rgba(255,192,203,0.15)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0 8px 28px rgba(255,192,203,0.2)')}
+              onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-black text-coal">{c.company_name || c.name}</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5 font-medium">License: {c.license_number || 'DGMS/REG/2026'}</p>
+                </div>
+                <span
+                  className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg"
+                  style={c.status === 'active'
+                    ? { background: 'rgba(16,185,129,0.1)', color: '#047857' }
+                    : { background: 'rgba(239,68,68,0.1)', color: '#B91C1C' }}
+                >
+                  {c.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 px-3.5 py-3 rounded-xl"
+                style={{ background: 'rgba(255,192,203,0.05)', border: '1px solid rgba(255,192,203,0.1)' }}>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Workers</span>
+                  <span className="font-black text-coal flex items-center gap-1 mt-0.5 text-sm">
+                    <Users className="w-3.5 h-3.5" style={{ color: '#FFC0CB' }} />
+                    {c.workers_count || c.worker_count || 0}
                   </span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
-                  <div>
-                    <span className="text-slate-400 block text-[10px] uppercase">Active Workers</span>
-                    <span className="font-bold text-slate-800 flex items-center gap-1 mt-0.5">
-                      <Users className="w-3.5 h-3.5 text-slate-500" />
-                      {c.workers_count || c.worker_count || 0}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px] uppercase">Safety Score</span>
-                    <span className="font-bold text-emerald-600 flex items-center gap-1 mt-0.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                      {c.safety_score || 0}%
-                    </span>
-                  </div>
-                </div>
-
-                <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-slate-400" />
-                    Valid until: {formatDate(c.valid_until || c.contract_end)}
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Safety</span>
+                  <span className="font-black text-emerald-600 flex items-center gap-1 mt-0.5 text-sm">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                    {c.safety_score || 0}%
                   </span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium border-t pt-3"
+                style={{ borderColor: 'rgba(255,192,203,0.15)' }}>
+                <Clock className="w-3 h-3 flex-shrink-0" style={{ color: '#FFC0CB' }} />
+                Valid until: {formatDate(c.valid_until || c.contract_end)}
+              </div>
+            </div>
           ))
         ) : (
-          <div className="col-span-full py-16 text-center text-xs text-slate-400">
-            No registered contractors found for this mine.
+          <div className="col-span-full py-20 flex flex-col items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center animate-float"
+              style={{ background: 'rgba(255,192,203,0.1)', border: '1px solid rgba(255,192,203,0.2)' }}>
+              <Users className="w-7 h-7" style={{ color: '#FFC0CB' }} />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-bold text-coal">No contractors registered</p>
+              <p className="text-xs text-slate-400 mt-1">Add agencies to track their compliance and safety scores.</p>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Add Contractor Modal */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Register Contractor Agency</h3>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                  Contact Person / Representative
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ramesh Kumar"
-                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(10,10,10,0.7)', backdropFilter: 'blur(8px)' }}>
+          <div className="relative w-full max-w-md rounded-3xl overflow-hidden animate-scale-in"
+            style={{ background: 'rgba(253,248,251,0.98)', border: '1px solid rgba(255,192,203,0.3)', boxShadow: '0 40px 80px rgba(0,0,0,0.3)' }}>
+            <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,192,203,0.8), transparent)' }} />
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-base font-black text-coal">Register Contractor Agency</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Add DGMS-licensed contractor details</p>
+                </div>
+                <button onClick={() => setIsModalOpen(false)}
+                  className="p-1.5 rounded-lg transition-colors"
+                  style={{ color: '#94A3B8' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,192,203,0.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                  Agency / Company Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="e.g. Bharat Heavy Earthmovers Logistics"
-                  className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                />
-              </div>
+              <form onSubmit={handleCreate} className="space-y-3.5">
+                {[
+                  { label: 'Contact Person', value: name, set: setName, placeholder: 'e.g. Ramesh Kumar', type: 'text' },
+                  { label: 'Agency / Company Name', value: companyName, set: setCompanyName, placeholder: 'e.g. Bharat Heavy Earthmovers', type: 'text' },
+                ].map(({ label, value, set, placeholder, type }) => (
+                  <div key={label} className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</label>
+                    <input type={type} required value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder} className={inputCls} style={inputStyle} />
+                  </div>
+                ))}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Statutory License
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={licenseNumber}
-                    onChange={(e) => setLicenseNumber(e.target.value)}
-                    placeholder="DGMS-LIC-9921"
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Statutory License</label>
+                    <input type="text" required value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} placeholder="DGMS-LIC-9921" className={inputCls} style={inputStyle} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Valid Until</label>
+                    <input type="date" required value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className={inputCls} style={inputStyle} />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Valid Until
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={validUntil}
-                    onChange={(e) => setValidUntil(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Deployed Workers
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={workersCount}
-                    onChange={(e) => setWorkersCount(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Deployed Workers</label>
+                    <input type="number" min="1" value={workersCount} onChange={(e) => setWorkersCount(Number(e.target.value))} className={inputCls} style={inputStyle} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Safety Score %</label>
+                    <input type="number" min="0" max="100" value={safetyScore} onChange={(e) => setSafetyScore(Number(e.target.value))} className={inputCls} style={inputStyle} />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Initial Safety Score (%)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={safetyScore}
-                    onChange={(e) => setSafetyScore(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"
-                  />
-                </div>
-              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">Register Agency</Button>
-              </div>
-            </form>
+                <div className="flex items-center justify-end gap-3 pt-3 border-t" style={{ borderColor: 'rgba(255,192,203,0.2)' }}>
+                  <button type="button" onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 transition-all duration-150"
+                    style={{ border: '1px solid rgba(255,192,203,0.25)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,192,203,0.08)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >Cancel</button>
+                  <button type="submit"
+                    className="px-5 py-2.5 rounded-xl text-xs font-black text-coal transition-all duration-150 active:scale-[0.98]"
+                    style={{ background: 'linear-gradient(135deg, #FFC0CB, #FFD6DC)', boxShadow: '0 4px 14px rgba(255,192,203,0.4)' }}
+                  >Register Agency</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
