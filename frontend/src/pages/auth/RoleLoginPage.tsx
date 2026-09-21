@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
-export const LoginPage: React.FC = () => {
+export const RoleLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);

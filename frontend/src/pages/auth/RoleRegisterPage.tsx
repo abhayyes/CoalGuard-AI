@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sparkles, ArrowRight, User, Mail, Lock } from 'lucide-react';
 
-export const RegisterPage: React.FC = () => {
+import { useParams } from 'react-router-dom';
+
+export const RoleRegisterPage: React.FC = () => {
+  const { role } = useParams<{ role: string }>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -137,7 +140,7 @@ export const RegisterPage: React.FC = () => {
             </form>
 
             <div className="mt-6 text-center animate-fade-in-up" style={{ animationDelay: '350ms' }}>
-              <button onClick={() => navigate('/login')}
+              <button onClick={() => navigate('/login/' + (role || 'mine_official'))}
                 className="text-xs text-white/30 hover:text-pink-baby transition-colors font-medium underline underline-offset-4">
                 Already have an account? Sign in
               </button>

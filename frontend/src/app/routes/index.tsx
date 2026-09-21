@@ -4,8 +4,9 @@ import { AppShell } from '../layouts/AppShell';
 import { ProtectedRoute } from './ProtectedRoute';
 
 // Auth Pages
-import { LoginPage } from '../../pages/auth/LoginPage';
-import { RegisterPage } from '../../pages/auth/RegisterPage';
+import { PortalSelectorPage } from '../../pages/auth/PortalSelectorPage';
+import { RoleLoginPage } from '../../pages/auth/RoleLoginPage';
+import { RoleRegisterPage } from '../../pages/auth/RoleRegisterPage';
 
 // Mine Scoped Pages
 import { MineDashboardPage } from '../../pages/mine/MineDashboardPage';
@@ -31,9 +32,11 @@ import { ComplianceDetailPage } from '../../pages/mine/ComplianceDetailPage';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public Login Route */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      {/* Public Login Routes */}
+      <Route path="/login" element={<PortalSelectorPage />} />
+      <Route path="/login/:role" element={<RoleLoginPage />} />
+      <Route path="/register/:role" element={<RoleRegisterPage />} />
+      <Route path="/register" element={<RoleRegisterPage />} />
 
       {/* Protected App Routes inside Shell */}
       <Route
@@ -106,11 +109,12 @@ export const AppRoutes: React.FC = () => {
         />
 
         {/* Default Redirect */}
-        <Route path="/" element={<Navigate to="/mine/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Route>
 
       {/* Catch-all redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 };
+
