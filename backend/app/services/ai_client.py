@@ -6,7 +6,7 @@ from app.config import settings
 class AIServiceClient:
     def __init__(self):
         # Ensure trailing slash is handled properly
-        self.base_url = settings.ai_service_url.rstrip('/')
+        self.base_url = settings.ai_service_url.strip(chr(34) + chr(39) + ' ').rstrip('/')
         self.timeout = 30.0
 
     async def _post(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
