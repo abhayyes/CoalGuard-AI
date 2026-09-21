@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
 export const RoleLoginPage: React.FC = () => {
+  const { role } = useParams<{ role: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
