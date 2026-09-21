@@ -66,3 +66,4 @@ app.include_router(assistant.router, prefix="/api/assistant", tags=["Assistant"]
 @app.get("/api/health")
 async def health_check() -> dict[str, str]:
     return {"status": "healthy", "service": "coalguard-ai"}
+

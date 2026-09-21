@@ -11,13 +11,13 @@ class Settings(BaseSettings):
     )
 
     # Database
-    database_url: str
+    database_url: str = 'postgresql+asyncpg://dummy:dummy@localhost:5432/dummy'
 
     # Supabase
-    supabase_url: str
-    supabase_anon_key: str
-    supabase_service_role_key: str
-    supabase_jwt_secret: str
+    supabase_url: str = 'https://dummy.supabase.co'
+    supabase_anon_key: str = 'dummy'
+    supabase_service_role_key: str = 'dummy'
+    supabase_jwt_secret: str = 'dummy'
 
     # CORS
     cors_origins: str = "http://localhost:5173"
