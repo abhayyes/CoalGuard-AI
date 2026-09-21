@@ -26,6 +26,25 @@ export const useAuthStore = create<AuthState>((set) => ({
   fetchProfile: async () => {
     try {
       set({ isLoading: true });
+
+      const mockRole = localStorage.getItem('mock_role');
+      if (mockRole) {
+        set({
+          user: {
+            id: 'mock-user-123',
+            email: ${mockRole}@coalguard.in,
+            full_name: Demo ,
+            role: mockRole as any,
+            is_active: true,
+            created_at: new Date().toISOString()
+          },
+          assignedMines: [],
+          isAuthenticated: true,
+          isLoading: false,
+        });
+        return;
+      }
+
       const response = await apiClient.get('/auth/me');
       const { user, assigned_mines } = response.data;
       set({
@@ -46,7 +65,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (e) {
       console.error('Supabase signOut error:', e);
     }
+    localStorage.removeItem('mock_role');
     set({ user: null, assignedMines: [], isAuthenticated: false, isLoading: false });
     window.location.href = '/login';
   },
 }));
+

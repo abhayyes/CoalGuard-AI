@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react';
+import { useAuthStore } from '../../stores/authStore';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { fetchProfile } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,3 +192,4 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
+
