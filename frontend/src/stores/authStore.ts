@@ -32,11 +32,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({
           user: {
             id: 'mock-user-123',
-            email: ${mockRole}@coalguard.in,
-            full_name: Demo ,
+            email: mockRole + '@coalguard.in',
+            full_name: 'Demo ' + mockRole,
             role: mockRole as any,
             is_active: true,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(), updated_at: new Date().toISOString()
           },
           assignedMines: [],
           isAuthenticated: true,

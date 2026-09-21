@@ -16,8 +16,19 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      
-      navigate('/mine/dashboard');
+      let targetDashboard = '/mine/dashboard';
+      if (email.includes('admin')) {
+        localStorage.setItem('mock_role', 'admin');
+        targetDashboard = '/admin/dashboard';
+      } else if (email.includes('corporate')) {
+        localStorage.setItem('mock_role', 'corporate');
+        targetDashboard = '/corporate/dashboard';
+      } else {
+        localStorage.setItem('mock_role', 'mine_official');
+        targetDashboard = '/mine/dashboard';
+      }
+      await fetchProfile();
+      navigate(targetDashboard);
     } catch (err) {
       console.error(err);
     } finally {
@@ -192,4 +203,5 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
+
 
