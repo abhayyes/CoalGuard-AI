@@ -10,7 +10,7 @@ class AIServiceClient:
         self.timeout = 30.0
 
     async def _post(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        ""\"Generic POST to the AI service""\"
+        """Generic POST to the AI service"""
         
         # The AI Service (Cloudflare tunnel) strictly expects a MineRecordBatch:
         # {"records": [ {...} ]}
