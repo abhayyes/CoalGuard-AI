@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Calendar, CheckCircle, Clock, ShieldCheck, AlertTriangle } from 'lucide-react';
-import { apiClient } from '../lib/api';
-import { ComplianceItem, ComplianceStatus } from '../types';
-import { RiskBadge } from '../components/ui/RiskBadge';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { formatDate } from '../lib/utils';
+import { apiClient } from '../../lib/api';
+import { ComplianceItem, ComplianceStatus } from '../../types';
+import { RiskBadge } from '../../components/ui/RiskBadge';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { formatDate } from '../../lib/utils';
 
 export const ComplianceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
