@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: str = "http://localhost:5173"
 
+    # AI Service
+    ai_service_url: str = "https://contracting-binary-yarn-enough.trycloudflare.com"
+
     # Environment
     env: str = "development"
 
@@ -35,3 +38,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore[call-arg]
+

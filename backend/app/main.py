@@ -20,6 +20,7 @@ from app.routers import (
     reports,
     audit_log,
     assistant,
+ai_proxy,
 )
 
 
@@ -64,9 +65,11 @@ app.include_router(documents.router, prefix="/api/documents", tags=["Documents"]
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(audit_log.router, prefix="/api/audit-log", tags=["Audit Log"])
 app.include_router(assistant.router, prefix="/api/assistant", tags=["Assistant"])
+app.include_router(ai_proxy.router, prefix="/api/ai", tags=["AI Service"])
 
 
 @app.get("/api/health")
 async def health_check() -> dict[str, str]:
     return {"status": "healthy", "service": "coalguard-ai"}
+
 
