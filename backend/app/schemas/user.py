@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 """User schemas."""
 
 from datetime import datetime
@@ -27,35 +30,35 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str | None = None
-    department: str | None = None
-    phone: str | None = None
+    password: Optional[str] = None
+    department: Optional[str] = None
+    phone: Optional[str] = None
 
 
 class UserUpdate(BaseModel):
-    email: EmailStr | None = None
-    full_name: str | None = None
-    role: UserRole | None = None
-    department: str | None = None
-    phone: str | None = None
-    is_active: bool | None = None
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    role: Optional[UserRole] = None
+    department: Optional[str] = None
+    phone: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    supabase_uid: UUID | None = None
+    supabase_uid: Optional[UUID] = None
     email: str
     full_name: str
     role: UserRole
-    department: str | None = None
-    phone: str | None = None
+    department: Optional[str] = None
+    phone: Optional[str] = None
     is_active: bool
     created_at: datetime
     updated_at: datetime
 
 
 class UserListResponse(BaseModel):
-    data: list[UserResponse]
+    data: List[UserResponse]
     meta: PaginationMeta

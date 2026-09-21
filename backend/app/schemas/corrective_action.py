@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 """Corrective Action schemas."""
 
 from datetime import date, datetime
@@ -17,21 +20,21 @@ class CorrectiveActionBase(BaseModel):
 
 
 class CorrectiveActionCreate(CorrectiveActionBase):
-    assigned_by: UUID | None = None
+    assigned_by: Optional[UUID] = None
 
 
 class CorrectiveActionUpdate(BaseModel):
-    description: str | None = None
-    assigned_to: UUID | None = None
-    deadline: date | None = None
-    status: CorrectiveActionStatus | None = None
-    completion_notes: str | None = None
-    completion_photo_url: str | None = None
+    description: Optional[str] = None
+    assigned_to: Optional[UUID] = None
+    deadline: Optional[date] = None
+    status: Optional[CorrectiveActionStatus] = None
+    completion_notes: Optional[str] = None
+    completion_photo_url: Optional[str] = None
 
 
 class CorrectiveActionVerify(BaseModel):
     verified: bool = True
-    notes: str | None = None
+    notes: Optional[str] = None
 
 
 class CorrectiveActionResponse(BaseModel):
@@ -44,15 +47,15 @@ class CorrectiveActionResponse(BaseModel):
     assigned_by: UUID
     deadline: date
     status: CorrectiveActionStatus
-    completion_notes: str | None = None
-    completion_photo_url: str | None = None
-    completed_at: datetime | None = None
-    verified_by: UUID | None = None
-    verified_at: datetime | None = None
+    completion_notes: Optional[str] = None
+    completion_photo_url: Optional[str] = None
+    completed_at: Optional[datetime] = None
+    verified_by: Optional[UUID] = None
+    verified_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
 
 
 class CorrectiveActionListResponse(BaseModel):
-    data: list[CorrectiveActionResponse]
+    data: List[CorrectiveActionResponse]
     meta: PaginationMeta

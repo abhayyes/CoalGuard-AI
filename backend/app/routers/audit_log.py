@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 from math import ceil
 from typing import Any
@@ -19,11 +21,11 @@ router = APIRouter()
 @router.get("", response_model=AuditLogListResponse)
 async def list_audit_logs(
     user_id: UUID | None = None,
-    entity_type: str | None = None,
+    entity_type: Optional[str] = None,
     entity_id: UUID | None = None,
-    action: str | None = None,
-    date_from: datetime | None = None,
-    date_to: datetime | None = None,
+    action: Optional[str] = None,
+    date_from: Optional[datetime] = None,
+    date_to: Optional[datetime] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     _current_user: User = Depends(require_role(UserRole.admin, UserRole.regulatory)),

@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 import enum
 from datetime import date, datetime
 from uuid import uuid4
@@ -20,7 +23,7 @@ class CorrectiveActionStatus(str, enum.Enum):
 class CorrectiveAction(Base):
     __tablename__ = "corrective_actions"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     observation_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False), ForeignKey("observations.id"), nullable=False
     )
@@ -32,11 +35,11 @@ class CorrectiveAction(Base):
         Enum(CorrectiveActionStatus, name="corrective_action_status_enum"),
         default=CorrectiveActionStatus.assigned,
     )
-    completion_notes: Mapped[str | None] = mapped_column(Text)
-    completion_photo_url: Mapped[str | None] = mapped_column(Text)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    verified_by: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"))
-    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completion_notes: Mapped[Optional[str]] = mapped_column(Text)
+    completion_photo_url: Mapped[Optional[str]] = mapped_column(Text)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    verified_by: Mapped[Optional[str]] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"))
+    verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow

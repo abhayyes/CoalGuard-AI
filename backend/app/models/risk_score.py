@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 from datetime import datetime
 from uuid import uuid4
 
@@ -15,14 +18,14 @@ class RiskScore(Base):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=uuid4)
     mine_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("mines.id"), nullable=False)
     overall_score: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    compliance_risk: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    safety_risk: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    environmental_risk: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    historical_risk: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    operational_risk: Mapped[float | None] = mapped_column(Numeric(5, 2))
-    risk_level: Mapped[RiskLevel | None] = mapped_column(Enum(RiskLevel, name="risk_level_enum"))
-    anomalies: Mapped[list | dict | None] = mapped_column(JSON)
-    recommendations: Mapped[list | dict | None] = mapped_column(JSON)
+    compliance_risk: Mapped[Optional[float]] = mapped_column(Numeric(5, 2))
+    safety_risk: Mapped[Optional[float]] = mapped_column(Numeric(5, 2))
+    environmental_risk: Mapped[Optional[float]] = mapped_column(Numeric(5, 2))
+    historical_risk: Mapped[Optional[float]] = mapped_column(Numeric(5, 2))
+    operational_risk: Mapped[Optional[float]] = mapped_column(Numeric(5, 2))
+    risk_level: Mapped[Optional[RiskLevel]] = mapped_column(Enum(RiskLevel, name="risk_level_enum"))
+    anomalies: Mapped[Optional[Any]] = mapped_column(JSON)
+    recommendations: Mapped[Optional[Any]] = mapped_column(JSON)
     calculated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
     # Relationships

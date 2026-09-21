@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 import enum
 from datetime import date, datetime
 from uuid import uuid4
@@ -27,17 +30,17 @@ class InspectionStatus(str, enum.Enum):
 class Inspection(Base):
     __tablename__ = "inspections"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     mine_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("mines.id"), nullable=False)
     inspector_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
     inspection_type: Mapped[InspectionType] = mapped_column(
         Enum(InspectionType, name="inspection_type_enum"), nullable=False
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
-    latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
-    longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
-    checklist_data: Mapped[dict | None] = mapped_column(JSON)
-    summary: Mapped[str | None] = mapped_column(Text)
+    latitude: Mapped[Optional[float]] = mapped_column(Numeric(10, 7))
+    longitude: Mapped[Optional[float]] = mapped_column(Numeric(10, 7))
+    checklist_data: Mapped[Optional[dict]] = mapped_column(JSON)
+    summary: Mapped[Optional[str]] = mapped_column(Text)
     status: Mapped[InspectionStatus] = mapped_column(
         Enum(InspectionStatus, name="inspection_status_enum"), default=InspectionStatus.draft
     )

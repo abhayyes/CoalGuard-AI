@@ -1,3 +1,4 @@
+from __future__ import annotations
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -5,13 +6,15 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
 
-engine = create_async_engine(
-    settings.database_url,
-    echo=settings.is_development,
-    pool_size=5,
-    max_overflow=10,
-    connect_args={"statement_cache_size": 0},
-)
+engine_kwargs = {"echo": settings.is_development}
+if "sqlite" not in settings.database_url:
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 10,
+        "connect_args": {"statement_cache_size": 0},
+    })
+
+engine = create_async_engine(settings.database_url, **engine_kwargs)
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -31,3 +34,4 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         except Exception:
             await session.rollback()
             raise
+

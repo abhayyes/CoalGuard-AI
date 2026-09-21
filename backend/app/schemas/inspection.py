@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
 import datetime
 from decimal import Decimal
 from typing import Any
@@ -17,21 +19,21 @@ class InspectionBase(BaseModel):
 
 
 class InspectionCreate(InspectionBase):
-    inspector_id: UUID | None = None
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
-    checklist_data: dict[str, Any] | None = None
-    summary: str | None = None
+    inspector_id: Optional[UUID] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
+    checklist_data: Dict[str, Optional[Any]] = None
+    summary: Optional[str] = None
 
 
 class InspectionUpdate(BaseModel):
-    inspection_type: InspectionType | None = None
-    date: datetime.date | None = None
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
-    checklist_data: dict[str, Any] | None = None
-    summary: str | None = None
-    status: InspectionStatus | None = None
+    inspection_type: Optional[InspectionType] = None
+    date: Optional[datetime.date] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
+    checklist_data: Dict[str, Optional[Any]] = None
+    summary: Optional[str] = None
+    status: Optional[InspectionStatus] = None
 
 
 class InspectionResponse(BaseModel):
@@ -42,16 +44,16 @@ class InspectionResponse(BaseModel):
     inspector_id: UUID
     inspection_type: InspectionType
     date: datetime.date
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
-    checklist_data: dict[str, Any] | None = None
-    summary: str | None = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
+    checklist_data: Dict[str, Optional[Any]] = None
+    summary: Optional[str] = None
     status: InspectionStatus
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    observations: list[ObservationResponse] = []
+    observations: List[ObservationResponse] = []
 
 
 class InspectionListResponse(BaseModel):
-    data: list[InspectionResponse]
+    data: List[InspectionResponse]
     meta: PaginationMeta

@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
 """Audit Log schemas."""
 
 from datetime import datetime
@@ -13,17 +15,17 @@ class AuditLogResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    user_id: UUID | None = None
+    user_id: Optional[UUID] = None
     action: str
     entity_type: str
-    entity_id: UUID | None = None
-    old_values: Any | None = None
-    new_values: Any | None = None
-    ip_address: str | None = None
-    user_agent: str | None = None
+    entity_id: Optional[UUID] = None
+    old_values: Optional[Any] = None
+    new_values: Optional[Any] = None
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
     created_at: datetime
 
 
 class AuditLogListResponse(BaseModel):
-    data: list[AuditLogResponse]
+    data: List[AuditLogResponse]
     meta: PaginationMeta

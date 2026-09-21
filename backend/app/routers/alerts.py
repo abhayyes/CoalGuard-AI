@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 from math import ceil
 from typing import Any
@@ -28,8 +30,8 @@ async def list_alerts(
     mine_id: UUID | None = None,
     type: AlertType | None = None,
     severity: AlertSeverity | None = None,
-    is_read: bool | None = None,
-    is_resolved: bool | None = None,
+    is_read: Optional[bool] = None,
+    is_resolved: Optional[bool] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),

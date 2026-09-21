@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 from typing import Any, List, Optional
 from pydantic import BaseModel
 
@@ -23,5 +26,5 @@ class QueryQuickAction(BaseModel):
 class AssistantChatResponse(BaseModel):
     reply: str
     language: str
-    data_context: Optional[dict[str, Any]] = None
+    data_context: Optional[Dict[str, Any]] = None
     quick_actions: Optional[List[QueryQuickAction]] = None

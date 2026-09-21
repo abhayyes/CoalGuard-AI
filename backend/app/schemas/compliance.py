@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
 """Compliance schemas."""
 
 from datetime import date, datetime
@@ -22,23 +24,23 @@ class ComplianceBase(BaseModel):
 
 
 class ComplianceCreate(ComplianceBase):
-    sub_category: str | None = None
-    risk_level: RiskLevel | None = None
-    responsible_user_id: UUID | None = None
-    document_url: str | None = None
+    sub_category: Optional[str] = None
+    risk_level: Optional[RiskLevel] = None
+    responsible_user_id: Optional[UUID] = None
+    document_url: Optional[str] = None
 
 
 class ComplianceUpdate(BaseModel):
-    requirement: str | None = None
-    category: ComplianceCategory | None = None
-    sub_category: str | None = None
-    due_date: date | None = None
-    responsible_user_id: UUID | None = None
-    status: ComplianceStatus | None = None
-    risk_level: RiskLevel | None = None
-    document_url: str | None = None
-    completion_date: date | None = None
-    completion_notes: str | None = None
+    requirement: Optional[str] = None
+    category: Optional[ComplianceCategory] = None
+    sub_category: Optional[str] = None
+    due_date: Optional[date] = None
+    responsible_user_id: Optional[UUID] = None
+    status: Optional[ComplianceStatus] = None
+    risk_level: Optional[RiskLevel] = None
+    document_url: Optional[str] = None
+    completion_date: Optional[date] = None
+    completion_notes: Optional[str] = None
 
 
 class ComplianceResponse(BaseModel):
@@ -48,21 +50,21 @@ class ComplianceResponse(BaseModel):
     mine_id: UUID
     requirement: str
     category: ComplianceCategory
-    sub_category: str | None = None
+    sub_category: Optional[str] = None
     due_date: date
-    responsible_user_id: UUID | None = None
+    responsible_user_id: Optional[UUID] = None
     status: ComplianceStatus
-    risk_level: RiskLevel | None = None
-    document_url: str | None = None
-    completion_date: date | None = None
-    completion_notes: str | None = None
-    created_by: UUID | None = None
+    risk_level: Optional[RiskLevel] = None
+    document_url: Optional[str] = None
+    completion_date: Optional[date] = None
+    completion_notes: Optional[str] = None
+    created_by: Optional[UUID] = None
     created_at: datetime
     updated_at: datetime
 
 
 class ComplianceListResponse(BaseModel):
-    data: list[ComplianceResponse]
+    data: List[ComplianceResponse]
     meta: PaginationMeta
 
 
@@ -73,4 +75,4 @@ class ComplianceStatsResponse(BaseModel):
     in_progress: int
     overdue: int
     compliance_rate: float
-    by_category: dict[str, int]
+    by_category: Dict[str, int]

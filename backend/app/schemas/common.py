@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 """Common schemas shared across modules."""
 
 from typing import Any, Generic, TypeVar
@@ -14,19 +17,19 @@ class PaginationMeta(BaseModel):
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
-    data: list[Any]  # overridden in concrete subclasses
+    data: List[Any]  # overridden in concrete subclasses
     meta: PaginationMeta
 
 
 class ErrorDetail(BaseModel):
-    field: str | None = None
+    field: Optional[str] = None
     message: str
 
 
 class ErrorResponse(BaseModel):
     code: str
     message: str
-    details: list[ErrorDetail] | None = None
+    details: Optional[List[ErrorDetail]] = None
 
 
 class SuccessResponse(BaseModel):

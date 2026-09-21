@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
 """Document schemas."""
 
 from datetime import datetime
@@ -16,36 +18,36 @@ class DocumentBase(BaseModel):
 
 
 class DocumentCreate(DocumentBase):
-    mine_id: UUID | None = None
-    file_type: str | None = None
-    file_size_bytes: int | None = None
-    linked_compliance_id: UUID | None = None
+    mine_id: Optional[UUID] = None
+    file_type: Optional[str] = None
+    file_size_bytes: Optional[int] = None
+    linked_compliance_id: Optional[UUID] = None
 
 
 class DocumentUpdate(BaseModel):
-    file_name: str | None = None
-    ocr_extracted_fields: dict[str, Any] | None = None
-    linked_compliance_id: UUID | None = None
+    file_name: Optional[str] = None
+    ocr_extracted_fields: Dict[str, Optional[Any]] = None
+    linked_compliance_id: Optional[UUID] = None
 
 
 class DocumentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    mine_id: UUID | None = None
-    uploaded_by: UUID | None = None
+    mine_id: Optional[UUID] = None
+    uploaded_by: Optional[UUID] = None
     file_name: str
     file_url: str
-    file_type: str | None = None
-    file_size_bytes: int | None = None
+    file_type: Optional[str] = None
+    file_size_bytes: Optional[int] = None
     ocr_status: OCRStatus
-    ocr_extracted_text: str | None = None
-    ocr_extracted_fields: dict[str, Any] | None = None
-    linked_compliance_id: UUID | None = None
+    ocr_extracted_text: Optional[str] = None
+    ocr_extracted_fields: Dict[str, Optional[Any]] = None
+    linked_compliance_id: Optional[UUID] = None
     created_at: datetime
     updated_at: datetime
 
 
 class DocumentListResponse(BaseModel):
-    data: list[DocumentResponse]
+    data: List[DocumentResponse]
     meta: PaginationMeta

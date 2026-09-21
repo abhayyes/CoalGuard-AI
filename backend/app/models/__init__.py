@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 from app.models.user import User, UserRole
 from app.models.mine import Mine, MineType
 from app.models.mine_assignment import MineAssignment

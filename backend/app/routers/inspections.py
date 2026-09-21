@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from datetime import date
 from math import ceil
 from typing import Any
@@ -34,8 +36,8 @@ async def list_inspections(
     inspector_id: UUID | None = None,
     type: InspectionType | None = None,
     status: InspectionStatus | None = None,
-    date_from: date | None = None,
-    date_to: date | None = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),

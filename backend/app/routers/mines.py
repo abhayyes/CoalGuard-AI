@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from math import ceil
 from typing import Any
 from uuid import UUID
@@ -32,8 +34,8 @@ router = APIRouter()
 
 @router.get("", response_model=MineListResponse)
 async def list_mines(
-    state: str | None = None,
-    is_active: bool | None = None,
+    state: Optional[str] = None,
+    is_active: Optional[bool] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),

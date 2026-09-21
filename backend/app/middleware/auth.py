@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 import logging
 from collections.abc import Callable
 from typing import Any
@@ -19,7 +21,7 @@ logger = logging.getLogger(__name__)
 security = HTTPBearer(auto_error=False)
 
 
-def verify_supabase_token(token: str) -> dict[str, Any]:
+def verify_supabase_token(token: str) -> Dict[str, Any]:
     """Verify Supabase JWT token and return payload."""
     try:
         # If jwt secret is provided, verify signature
@@ -131,7 +133,7 @@ def require_role(*allowed_roles: UserRole | str) -> Callable:
     return role_checker
 
 
-async def get_user_mine_ids(db: AsyncSession, user_id: str | UUID) -> list[str]:
+async def get_user_mine_ids(db: AsyncSession, user_id: Union[str, UUID]) -> List[str]:
     """Retrieve list of mine IDs assigned to a user."""
     user_id_str = str(user_id)
     stmt = select(MineAssignment.mine_id).where(MineAssignment.user_id == user_id_str)
@@ -139,7 +141,7 @@ async def get_user_mine_ids(db: AsyncSession, user_id: str | UUID) -> list[str]:
     return [str(mid) for mid in result.scalars().all()]
 
 
-def check_mine_access(user: User, mine_id: str | UUID, user_mine_ids: list[str]) -> bool:
+def check_mine_access(user: User, mine_id: Union[str, UUID], user_mine_ids: List[str]) -> bool:
     """Check if a user has access to a specific mine."""
     role_str = user.role.value if isinstance(user.role, UserRole) else str(user.role)
     if role_str in [UserRole.admin.value, UserRole.corporate.value, UserRole.regulatory.value]:

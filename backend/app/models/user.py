@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 import enum
 from datetime import datetime
 from uuid import uuid4
@@ -23,13 +26,13 @@ class UserRole(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     supabase_uid: Mapped[str] = mapped_column(UUID(as_uuid=False), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="user_role"), nullable=False)
-    department: Mapped[str | None] = mapped_column(String(100))
-    phone: Mapped[str | None] = mapped_column(String(20))
+    department: Mapped[Optional[str]] = mapped_column(String(100))
+    phone: Mapped[Optional[str]] = mapped_column(String(20))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)

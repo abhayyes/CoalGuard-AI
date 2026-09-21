@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from math import ceil
 from typing import Any
 from uuid import UUID, uuid4
@@ -24,8 +26,8 @@ router = APIRouter()
 @router.get("", response_model=UserListResponse)
 async def list_users(
     role: UserRole | None = None,
-    is_active: bool | None = None,
-    search: str | None = None,
+    is_active: Optional[bool] = None,
+    search: Optional[str] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     _current_user: User = Depends(require_role(UserRole.admin)),
