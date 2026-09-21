@@ -2,7 +2,7 @@ import axios from 'axios';
 import { supabase } from './supabase';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://coalguard-backend.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:10002/api' : 'https://coalguard-backend.onrender.com/api'),
   headers: {
     'Content-Type': 'application/json',
   },
