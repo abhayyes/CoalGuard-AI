@@ -4,14 +4,24 @@ from app.config import settings
 
 class AIServiceClient:
     def __init__(self):
-        self.base_url = settings.ai_service_url
+        # Ensure trailing slash is handled properly
+        self.base_url = settings.ai_service_url.rstrip('/')
         self.timeout = 30.0
 
     async def _post(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Generic POST to the AI service"""
+        ""\"Generic POST to the AI service""\"
+        
+        # The AI Service (Cloudflare tunnel) strictly expects a MineRecordBatch:
+        # {"records": [ {...} ]}
+        # If the frontend didn't wrap it in 'records', we wrap it here.
+        if "records" not in payload:
+            formatted_payload = {"records": [payload]}
+        else:
+            formatted_payload = payload
+
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:
-                response = await client.post(f"{self.base_url}{endpoint}", json=payload)
+                response = await client.post(f"{self.base_url}{endpoint}", json=formatted_payload)
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPStatusError as e:
