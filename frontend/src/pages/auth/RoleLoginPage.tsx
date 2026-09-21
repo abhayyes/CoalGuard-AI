@@ -17,16 +17,18 @@ export const RoleLoginPage: React.FC = () => {
     setIsLoading(true);
     try {
       let targetDashboard = '/mine/dashboard';
-      if (email.includes('admin')) {
-        localStorage.setItem('mock_role', 'admin');
+      const safeRole = role || 'mine_official';
+      
+      localStorage.setItem('mock_role', safeRole);
+      
+      if (safeRole === 'admin') {
         targetDashboard = '/admin/dashboard';
-      } else if (email.includes('corporate')) {
-        localStorage.setItem('mock_role', 'corporate');
+      } else if (safeRole === 'corporate') {
         targetDashboard = '/corporate/dashboard';
       } else {
-        localStorage.setItem('mock_role', 'mine_official');
         targetDashboard = '/mine/dashboard';
       }
+      
       await fetchProfile();
       navigate(targetDashboard);
     } catch (err) {
