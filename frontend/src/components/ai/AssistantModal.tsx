@@ -16,6 +16,7 @@ import {
   Maximize2
 } from 'lucide-react';
 import { apiClient } from '../../lib/api';
+import { aiService } from '../../lib/aiApi';
 import { useMineStore } from '../../stores/mineStore';
 
 interface Message {
