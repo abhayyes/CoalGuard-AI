@@ -45,7 +45,7 @@ const NavItem: React.FC<{ to: string; label: string; icon: React.ElementType; de
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuthStore();
-  const role = user?.role || 'mine_official';
+  const role = user?.role || 'admin';
 
   const mineNavItems = [
     { to: '/mine/dashboard',    label: 'Dashboard',         icon: LayoutDashboard },

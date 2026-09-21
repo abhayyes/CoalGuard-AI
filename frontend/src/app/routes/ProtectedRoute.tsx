@@ -8,11 +8,9 @@ interface ProtectedRouteProps { children: React.ReactNode;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
-  const { user, isLoading, isAuthenticated, fetchProfile } = useAuthStore();
+  const { user, isLoading, isAuthenticated } = useAuthStore();
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+
 
   if (isLoading) {
     return (
@@ -40,3 +38,4 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, ch
 
   return children ? <>{children}</> : <Outlet />;
 };
+

@@ -5,12 +5,12 @@ import { useAuthStore } from './stores/authStore';
 import { useMineStore } from './stores/mineStore';
 
 export const App: React.FC = () => {
-  const { initialize, isAuthenticated } = useAuthStore();
+  const { fetchProfile, isAuthenticated } = useAuthStore();
   const { fetchMines } = useMineStore();
 
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    fetchProfile();
+  }, [fetchProfile]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -26,3 +26,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

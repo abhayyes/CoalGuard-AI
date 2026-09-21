@@ -15,7 +15,7 @@ export const RegisterPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 1200));
+      
       navigate('/mine/dashboard');
     } catch (err) {
       console.error(err);

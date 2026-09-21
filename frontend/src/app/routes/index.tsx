@@ -20,9 +20,12 @@ import { DocumentsPage } from '../../pages/mine/DocumentsPage';
 // Admin Pages
 import { AdminDashboardPage } from '../../pages/admin/AdminDashboardPage';
 import { UsersPage } from '../../pages/admin/UsersPage';
+import { MinesConfigPage } from '../../pages/admin/MinesConfigPage';
+import { AuditLogPage } from '../../pages/admin/AuditLogPage';
 
 // Corporate Pages
 import { CorporateDashboardPage } from '../../pages/corporate/CorporateDashboardPage';
+import { CorporateReportsPage } from '../../pages/corporate/CorporateReportsPage';
 import { ComplianceDetailPage } from '../../pages/mine/ComplianceDetailPage';
 
 export const AppRoutes: React.FC = () => {
@@ -59,6 +62,14 @@ export const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/corporate/reports"
+          element={
+            <ProtectedRoute allowedRoles={['corporate', 'admin', 'regulatory']}>
+              <CorporateReportsPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Admin Routes */}
         <Route
@@ -74,6 +85,22 @@ export const AppRoutes: React.FC = () => {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/mines"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <MinesConfigPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/audit-log"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AuditLogPage />
             </ProtectedRoute>
           }
         />
