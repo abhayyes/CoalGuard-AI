@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from datetime import date, datetime
 from math import ceil
 from typing import Any
@@ -29,7 +31,7 @@ router = APIRouter()
 async def list_corrective_actions(
     assigned_to: UUID | None = None,
     status: CorrectiveActionStatus | None = None,
-    overdue: bool | None = None,
+    overdue: Optional[bool] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),

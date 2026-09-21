@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from datetime import date, timedelta
 from math import ceil
 from typing import Any
@@ -38,8 +40,8 @@ async def list_compliance(
     status: ComplianceStatus | None = None,
     category: ComplianceCategory | None = None,
     risk_level: RiskLevel | None = None,
-    due_before: date | None = None,
-    due_after: date | None = None,
+    due_before: Optional[date] = None,
+    due_after: Optional[date] = None,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),
@@ -122,7 +124,7 @@ async def get_compliance_stats(
 
     rate = round((completed / total * 100), 1) if total > 0 else 100.0
 
-    by_category: dict[str, int] = {}
+    by_category: Dict[str, int] = {}
     for item in all_items:
         cat_key = item.category.value if isinstance(item.category, ComplianceCategory) else str(item.category)
         by_category[cat_key] = by_category.get(cat_key, 0) + 1

@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
 """Mine schemas."""
 
 from datetime import datetime
@@ -25,26 +27,26 @@ class MineBase(BaseModel):
 
 
 class MineCreate(MineBase):
-    code: str | None = None
-    subsidiary: str | None = None
-    district: str | None = None
-    location_description: str | None = None
-    boundary_geojson: dict[str, Any] | None = None
-    mine_type: MineType | None = None
+    code: Optional[str] = None
+    subsidiary: Optional[str] = None
+    district: Optional[str] = None
+    location_description: Optional[str] = None
+    boundary_geojson: Dict[str, Optional[Any]] = None
+    mine_type: Optional[MineType] = None
 
 
 class MineUpdate(BaseModel):
-    name: str | None = None
-    code: str | None = None
-    subsidiary: str | None = None
-    state: str | None = None
-    district: str | None = None
-    location_description: str | None = None
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
-    boundary_geojson: dict[str, Any] | None = None
-    mine_type: MineType | None = None
-    is_active: bool | None = None
+    name: Optional[str] = None
+    code: Optional[str] = None
+    subsidiary: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    location_description: Optional[str] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
+    boundary_geojson: Dict[str, Optional[Any]] = None
+    mine_type: Optional[MineType] = None
+    is_active: Optional[bool] = None
 
 
 class MineResponse(BaseModel):
@@ -52,15 +54,15 @@ class MineResponse(BaseModel):
 
     id: UUID
     name: str
-    code: str | None = None
-    subsidiary: str | None = None
+    code: Optional[str] = None
+    subsidiary: Optional[str] = None
     state: str
-    district: str | None = None
-    location_description: str | None = None
+    district: Optional[str] = None
+    location_description: Optional[str] = None
     latitude: Decimal
     longitude: Decimal
-    boundary_geojson: dict[str, Any] | None = None
-    mine_type: MineType | None = None
+    boundary_geojson: Dict[str, Optional[Any]] = None
+    mine_type: Optional[MineType] = None
     is_active: bool
     created_at: datetime
     updated_at: datetime
@@ -76,5 +78,5 @@ class MineSummaryResponse(BaseModel):
 
 
 class MineListResponse(BaseModel):
-    data: list[MineResponse]
+    data: List[MineResponse]
     meta: PaginationMeta

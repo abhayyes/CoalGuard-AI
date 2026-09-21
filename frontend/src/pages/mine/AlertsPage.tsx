@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, AlertOctagon, Bell, Zap } from 'lucide-react';
 import { aiService } from '../../lib/aiApi';
+import { AiReportModal } from '../../components/ai/AiReportModal';
 import { apiClient } from '../../lib/api';
 import { useMineStore } from '../../stores/mineStore';
 import { Alert } from '../../types';
@@ -172,42 +173,12 @@ export const AlertsPage: React.FC = () => {
       </div>
 
       {/* AI Report Modal */}
-      {aiReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-coal/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center" style={{ background: 'linear-gradient(to right, rgba(139, 92, 246, 0.05), rgba(99, 102, 241, 0.05))' }}>
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-indigo-100 text-indigo-600">
-                  <Zap className="w-4 h-4" />
-                </div>
-                <h3 className="font-black text-coal text-lg">AI Anomaly Scan Results</h3>
-              </div>
-              <button 
-                onClick={() => setAiReport(null)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
-              >
-                &times;
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto custom-scrollbar">
-              {aiReport.error ? (
-                <div className="text-red-500 font-medium text-sm">{aiReport.error}</div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                    <pre className="text-xs text-slate-600 font-mono whitespace-pre-wrap">
-                      {JSON.stringify(aiReport, null, 2)}
-                    </pre>
-                  </div>
-                  <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Deep scan completed by CoalGuard AI Engine
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <AiReportModal
+        isOpen={Boolean(aiReport)}
+        onClose={() => setAiReport(null)}
+        report={aiReport}
+        title="AI Anomaly Deep Scan"
+      />
     </div>
   );
 };

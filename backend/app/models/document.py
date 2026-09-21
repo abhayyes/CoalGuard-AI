@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 import enum
 from datetime import datetime
 from uuid import uuid4
@@ -19,19 +22,19 @@ class OCRStatus(str, enum.Enum):
 class Document(Base):
     __tablename__ = "documents"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=uuid4)
-    mine_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("mines.id"))
-    uploaded_by: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"))
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    mine_id: Mapped[Optional[str]] = mapped_column(UUID(as_uuid=False), ForeignKey("mines.id"))
+    uploaded_by: Mapped[Optional[str]] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"))
     file_name: Mapped[str] = mapped_column(String(255), nullable=False)
     file_url: Mapped[str] = mapped_column(Text, nullable=False)
-    file_type: Mapped[str | None] = mapped_column(String(50))
-    file_size_bytes: Mapped[int | None] = mapped_column(Integer)
+    file_type: Mapped[Optional[str]] = mapped_column(String(50))
+    file_size_bytes: Mapped[Optional[int]] = mapped_column(Integer)
     ocr_status: Mapped[OCRStatus] = mapped_column(
         Enum(OCRStatus, name="ocr_status_enum"), default=OCRStatus.pending
     )
-    ocr_extracted_text: Mapped[str | None] = mapped_column(Text)
-    ocr_extracted_fields: Mapped[dict | None] = mapped_column(JSON)
-    linked_compliance_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("compliance.id"))
+    ocr_extracted_text: Mapped[Optional[str]] = mapped_column(Text)
+    ocr_extracted_fields: Mapped[Optional[dict]] = mapped_column(JSON)
+    linked_compliance_id: Mapped[Optional[str]] = mapped_column(UUID(as_uuid=False), ForeignKey("compliance.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow

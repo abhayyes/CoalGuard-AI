@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from fastapi import APIRouter, HTTPException, Body, Response
 from typing import Dict, Any
 from app.services.ai_client import ai_client

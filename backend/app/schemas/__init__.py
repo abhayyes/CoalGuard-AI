@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 from .common import (
     PaginationMeta,
     PaginatedResponse,

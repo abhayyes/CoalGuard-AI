@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 import enum
 from datetime import datetime
 from uuid import uuid4
@@ -46,9 +49,9 @@ class Observation(Base):
     category: Mapped[ObservationCategory] = mapped_column(
         Enum(ObservationCategory, name="observation_category_enum"), default=ObservationCategory.other
     )
-    photo_urls: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
-    latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
-    longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    photo_urls: Mapped[Optional[List[str]]] = mapped_column(ARRAY(Text))
+    latitude: Mapped[Optional[float]] = mapped_column(Numeric(10, 7))
+    longitude: Mapped[Optional[float]] = mapped_column(Numeric(10, 7))
     status: Mapped[ObservationStatus] = mapped_column(
         Enum(ObservationStatus, name="observation_status_enum"), default=ObservationStatus.open
     )

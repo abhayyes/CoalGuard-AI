@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
 """Contractor schemas."""
 
 from datetime import date, datetime
@@ -18,25 +20,25 @@ class ContractorBase(BaseModel):
 
 
 class ContractorCreate(ContractorBase):
-    contract_number: str | None = None
-    scope_of_work: str | None = None
+    contract_number: Optional[str] = None
+    scope_of_work: Optional[str] = None
     worker_count: int = 0
     compliance_status: ContractorComplianceStatus = ContractorComplianceStatus.under_review
-    documents: list[dict[str, Any]] | None = None
-    training_records: list[dict[str, Any]] | None = None
+    documents: List[Dict[str, Optional[Any]]] = None
+    training_records: List[Dict[str, Optional[Any]]] = None
 
 
 class ContractorUpdate(BaseModel):
-    name: str | None = None
-    contract_number: str | None = None
-    contract_start: date | None = None
-    contract_end: date | None = None
-    scope_of_work: str | None = None
-    worker_count: int | None = None
-    compliance_status: ContractorComplianceStatus | None = None
-    documents: list[dict[str, Any]] | None = None
-    training_records: list[dict[str, Any]] | None = None
-    is_active: bool | None = None
+    name: Optional[str] = None
+    contract_number: Optional[str] = None
+    contract_start: Optional[date] = None
+    contract_end: Optional[date] = None
+    scope_of_work: Optional[str] = None
+    worker_count: Optional[int] = None
+    compliance_status: Optional[ContractorComplianceStatus] = None
+    documents: List[Dict[str, Optional[Any]]] = None
+    training_records: List[Dict[str, Optional[Any]]] = None
+    is_active: Optional[bool] = None
 
 
 class ContractorResponse(BaseModel):
@@ -45,19 +47,19 @@ class ContractorResponse(BaseModel):
     id: UUID
     name: str
     mine_id: UUID
-    contract_number: str | None = None
+    contract_number: Optional[str] = None
     contract_start: date
     contract_end: date
-    scope_of_work: str | None = None
+    scope_of_work: Optional[str] = None
     worker_count: int
     compliance_status: ContractorComplianceStatus
-    documents: Any | None = None
-    training_records: Any | None = None
+    documents: Optional[Any] = None
+    training_records: Optional[Any] = None
     is_active: bool
     created_at: datetime
     updated_at: datetime
 
 
 class ContractorListResponse(BaseModel):
-    data: list[ContractorResponse]
+    data: List[ContractorResponse]
     meta: PaginationMeta

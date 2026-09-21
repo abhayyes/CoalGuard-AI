@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 """Observation schemas."""
 
 from datetime import datetime
@@ -23,19 +26,19 @@ class ObservationBase(BaseModel):
 
 
 class ObservationCreate(ObservationBase):
-    photo_urls: list[str] | None = None
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
+    photo_urls: Optional[List[str]] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
 
 
 class ObservationUpdate(BaseModel):
-    description: str | None = None
-    severity: ObservationSeverity | None = None
-    category: ObservationCategory | None = None
-    photo_urls: list[str] | None = None
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
-    status: ObservationStatus | None = None
+    description: Optional[str] = None
+    severity: Optional[ObservationSeverity] = None
+    category: Optional[ObservationCategory] = None
+    photo_urls: Optional[List[str]] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
+    status: Optional[ObservationStatus] = None
 
 
 class ObservationResponse(BaseModel):
@@ -46,15 +49,15 @@ class ObservationResponse(BaseModel):
     description: str
     severity: ObservationSeverity
     category: ObservationCategory
-    photo_urls: list[str] | None = None
-    latitude: Decimal | None = None
-    longitude: Decimal | None = None
+    photo_urls: Optional[List[str]] = None
+    latitude: Optional[Decimal] = None
+    longitude: Optional[Decimal] = None
     status: ObservationStatus
     created_at: datetime
     updated_at: datetime
-    corrective_actions: list[CorrectiveActionResponse] = []
+    corrective_actions: List[CorrectiveActionResponse] = []
 
 
 class ObservationListResponse(BaseModel):
-    data: list[ObservationResponse]
+    data: List[ObservationResponse]
     meta: PaginationMeta

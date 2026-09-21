@@ -1,1 +1,1 @@
-export const AuditLogPage = () => <div className='p-6 bg-[#FCF9F5] text-black rounded-3xl backdrop-blur animate-fade-in'>AuditLogPage</div>;
+export { AuditLogPage } from './admin/AuditLogPage';

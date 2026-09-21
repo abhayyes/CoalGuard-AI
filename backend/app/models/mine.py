@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional
+from typing import Optional
 import enum
 from datetime import datetime
 from uuid import uuid4
@@ -18,17 +21,17 @@ class MineType(str, enum.Enum):
 class Mine(Base):
     __tablename__ = "mines"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    code: Mapped[str | None] = mapped_column(String(50), unique=True)
-    subsidiary: Mapped[str | None] = mapped_column(String(255))
+    code: Mapped[Optional[str]] = mapped_column(String(50), unique=True)
+    subsidiary: Mapped[Optional[str]] = mapped_column(String(255))
     state: Mapped[str] = mapped_column(String(100), nullable=False)
-    district: Mapped[str | None] = mapped_column(String(100))
-    location_description: Mapped[str | None] = mapped_column(Text)
+    district: Mapped[Optional[str]] = mapped_column(String(100))
+    location_description: Mapped[Optional[str]] = mapped_column(Text)
     latitude: Mapped[float] = mapped_column(Numeric(10, 7), nullable=False)
     longitude: Mapped[float] = mapped_column(Numeric(10, 7), nullable=False)
-    boundary_geojson: Mapped[dict | None] = mapped_column(JSON)
-    mine_type: Mapped[MineType | None] = mapped_column(Enum(MineType, name="mine_type_enum"))
+    boundary_geojson: Mapped[Optional[dict]] = mapped_column(JSON)
+    mine_type: Mapped[Optional[MineType]] = mapped_column(Enum(MineType, name="mine_type_enum"))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)

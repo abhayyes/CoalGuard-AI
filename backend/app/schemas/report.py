@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Optional, List, Dict, Any, Union
+from typing import List, Dict, Any, Optional, Union
 """Report schemas."""
 
 from datetime import date
@@ -17,25 +20,25 @@ class ComplianceReportItem(BaseModel):
 
 
 class ComplianceReportResponse(BaseModel):
-    mine_id: UUID | None = None
-    mine_name: str | None = None
-    from_date: date | None = None
-    to_date: date | None = None
-    summary: dict[str, Any]
-    by_category: list[ComplianceReportItem]
+    mine_id: Optional[UUID] = None
+    mine_name: Optional[str] = None
+    from_date: Optional[date] = None
+    to_date: Optional[date] = None
+    summary: Dict[str, Any]
+    by_category: List[ComplianceReportItem]
 
 
 class SafetyReportResponse(BaseModel):
-    mine_id: UUID | None = None
+    mine_id: Optional[UUID] = None
     total_inspections: int
     total_observations: int
-    observations_by_severity: dict[str, int]
+    observations_by_severity: Dict[str, int]
     corrective_actions_total: int
     corrective_actions_resolved: int
 
 
 class ContractorReportResponse(BaseModel):
-    mine_id: UUID | None = None
+    mine_id: Optional[UUID] = None
     total_contractors: int
     compliant_count: int
     non_compliant_count: int
@@ -48,4 +51,4 @@ class ExecutiveSummaryResponse(BaseModel):
     overall_compliance_rate: float
     total_open_violations: int
     high_risk_mines_count: int
-    mines_overview: list[dict[str, Any]]
+    mines_overview: List[Dict[str, Any]]

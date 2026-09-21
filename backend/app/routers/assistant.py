@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 import re
 from datetime import datetime
 from typing import Any, List
@@ -56,7 +58,7 @@ async def chat_with_assistant(
     mine_map = {m.id: m.name for m in accessible_mines}
 
     quick_actions: List[QueryQuickAction] = []
-    data_context: dict[str, Any] = {}
+    data_context: Dict[str, Any] = {}
 
     # Query Intent Detection
     # 1. OVERDUE COMPLIANCE ITEMS

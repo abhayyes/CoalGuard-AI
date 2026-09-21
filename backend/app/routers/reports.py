@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Optional, Union
 from datetime import date
 from typing import Any
 from uuid import UUID
@@ -45,8 +47,8 @@ router = APIRouter()
 @router.get("/compliance", response_model=ComplianceReportResponse)
 async def get_compliance_report(
     mine_id: UUID | None = None,
-    from_date: date | None = None,
-    to_date: date | None = None,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
