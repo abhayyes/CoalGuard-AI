@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { AssistantModal } from '../../components/ai/AssistantModal';
 
 export const AppShell: React.FC = () => {
   return (
@@ -22,6 +23,9 @@ export const AppShell: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {/* Floating Multilingual Conversational AI Assistant */}
+      <AssistantModal />
     </div>
   );
 };

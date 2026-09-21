@@ -19,6 +19,7 @@ from app.routers import (
     documents,
     reports,
     audit_log,
+    assistant,
 )
 
 
@@ -59,6 +60,7 @@ app.include_router(alerts.router, prefix="/api/alerts", tags=["Alerts"])
 app.include_router(documents.router, prefix="/api/documents", tags=["Documents"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(audit_log.router, prefix="/api/audit-log", tags=["Audit Log"])
+app.include_router(assistant.router, prefix="/api/assistant", tags=["Assistant"])
 
 
 @app.get("/api/health")
