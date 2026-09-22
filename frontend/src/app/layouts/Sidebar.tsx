@@ -55,6 +55,7 @@ export const Sidebar: React.FC = () => {
     { to: '/mine/contractors',  label: 'Contractors',       icon: Users },
     { to: '/mine/documents',    label: 'Documents & OCR',   icon: FileText },
     { to: '/mine/alerts',       label: 'Alerts',            icon: Shield },
+    { to: '/mine/risk',         label: 'Risk & Safety',     icon: Shield },
   ];
 
   const adminNavItems = [
