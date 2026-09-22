@@ -27,6 +27,8 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { RiskBadge } from '../../components/ui/RiskBadge';
 import { formatDate } from '../../lib/utils';
 import { ComplianceStats, Inspection, Alert } from '../../types';
+import { MineTelemetryPanel } from '../../components/telemetry/MineTelemetryPanel';
+import { TelemetryErrorBoundary } from '../../components/telemetry/TelemetryErrorBoundary';
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload?.length) {
@@ -144,6 +146,14 @@ export const MineDashboardPage: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* ── Real-Time Resilient Mine Telemetry Streaming Panel ── */}
+      <TelemetryErrorBoundary fallbackTitle="Mine Telemetry Feed Fault">
+        <MineTelemetryPanel
+          mineId={selectedMine?.id || 'default'}
+          mineName={selectedMine?.name || 'Main Mining Lease'}
+        />
+      </TelemetryErrorBoundary>
 
       {/* ── KPI Grid ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
