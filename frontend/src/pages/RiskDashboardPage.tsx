@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, TrendingUp, ShieldAlert, Zap, FileText, CheckCircle, Loader2 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { aiService } from '../../lib/aiApi';
+import { aiService } from '../lib/aiApi';
 
 const FALLBACK_RISK_DATA = [
   { category: 'Ventilation & Gas', risk: 85, threshold: 90 },
@@ -111,3 +111,4 @@ export const RiskDashboardPage: React.FC = () => {
       </div>
     </div>
   );
+};
