@@ -1,9 +1,14 @@
 import asyncio
-import sqlite3
-from datetime import date, datetime
-from uuid import uuid4
+from datetime import datetime, date, timezone
+import uuid
+import json
 
-# 10 Real Indian Mining Contractors & Designated Persons Dataset
+from sqlalchemy import select, delete
+
+from app.database import async_session
+from app.models import Mine
+from app.models.contractor import Contractor, ContractorComplianceStatus
+
 REAL_CONTRACTORS = [
     {
         "contract_id": "C001",
@@ -127,72 +132,58 @@ REAL_CONTRACTORS = [
     }
 ]
 
-def seed():
-    conn = sqlite3.connect("coalguard.db")
-    cursor = conn.cursor()
-
-    # Fetch mines
-    cursor.execute("SELECT id, name FROM mines")
-    mines = cursor.fetchall()
-    print(f"Found {len(mines)} mines: {mines}")
-
-    if not mines:
-        # Create a default mine if none exist
-        default_mine_id = str(uuid4()).replace("-", "")
-        cursor.execute(
-            "INSERT INTO mines (id, name, state, latitude, longitude, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (default_mine_id, "Jharia Coalfield Block-A", "Jharkhand", 23.75, 86.42, 1, datetime.utcnow(), datetime.utcnow())
-        )
-        mines = [(default_mine_id, "Jharia Coalfield Block-A")]
-
-    # Remove old contractor records to ensure clean 10-record dataset
-    cursor.execute("DELETE FROM contractors")
-    print("Cleared existing contractor records.")
-
-    now = datetime.utcnow().isoformat()
-
-    # Assign each of the 10 unique contractors to a mine without duplication
-    primary_mine_id = mines[0][0]
-    secondary_mine_id = mines[1][0] if len(mines) > 1 else primary_mine_id
-
-    print("\nSeeding 10 unique, non-duplicated contractors with distinct Contract IDs:")
-    for idx, item in enumerate(REAL_CONTRACTORS):
-        contractor_id = str(uuid4()).replace("-", "")
-        display_name = f"{item['company_name']} ({item['name']})"
-        doc_json = f'{{"company_name": "{item["company_name"]}", "contact_person": "{item["name"]}", "safety_score": {item["safety_score"]}, "license_number": "{item["license_number"]}", "contract_id": "{item["contract_id"]}"}}'
-
-        # Even-indexed to primary mine, odd-indexed to secondary mine, or all accessible
-        assigned_mine_id = primary_mine_id if idx % 2 == 0 else secondary_mine_id
-
-        cursor.execute(
-            """
-            INSERT INTO contractors (
-                id, name, mine_id, contract_number, contract_start, contract_end,
-                scope_of_work, worker_count, compliance_status, documents, is_active,
-                created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                contractor_id,
-                display_name,
-                assigned_mine_id,
-                item["contract_id"],
-                item["start_date"],
-                item["expiry_date"],
-                item["scope_of_work"],
-                item["worker_count"],
-                item["compliance_status"],
-                doc_json,
-                1,
-                now,
-                now
+async def seed():
+    async with async_session() as session:
+        # Fetch mines
+        result = await session.execute(select(Mine))
+        mines = result.scalars().all()
+        
+        if not mines:
+            print("No mines found. Please run seed_demo_data.py first.")
+            return
+            
+        print(f"Found {len(mines)} mines.")
+        
+        # Remove old contractor records to ensure clean 10-record dataset
+        await session.execute(delete(Contractor))
+        
+        primary_mine_id = mines[0].id
+        secondary_mine_id = mines[1].id if len(mines) > 1 else primary_mine_id
+        
+        print("\nSeeding 10 unique, non-duplicated contractors with distinct Contract IDs:")
+        
+        contractors_to_add = []
+        for idx, item in enumerate(REAL_CONTRACTORS):
+            display_name = f"{item['company_name']} ({item['name']})"
+            doc_dict = {
+                "company_name": item["company_name"],
+                "contact_person": item["name"],
+                "safety_score": item["safety_score"],
+                "license_number": item["license_number"],
+                "contract_id": item["contract_id"]
+            }
+            
+            assigned_mine_id = primary_mine_id if idx % 2 == 0 else secondary_mine_id
+            
+            c = Contractor(
+                id=uuid.uuid4(),
+                name=display_name,
+                mine_id=assigned_mine_id,
+                contract_number=item["contract_id"],
+                contract_start=date.fromisoformat(item["start_date"]),
+                contract_end=date.fromisoformat(item["expiry_date"]),
+                scope_of_work=item["scope_of_work"],
+                worker_count=item["worker_count"],
+                compliance_status=ContractorComplianceStatus(item["compliance_status"]),
+                documents=doc_dict,
+                is_active=True
             )
-        )
-        print(f"  [{idx+1}/10] {item['contract_id']} | {item['company_name']} ({item['name']}) -> Mine: {assigned_mine_id[:8]}... | Expires: {item['expiry_date']}")
-
-    conn.commit()
-    conn.close()
-    print("\n✓ Clean 10 unique contractors seeded successfully with no duplicates!")
+            contractors_to_add.append(c)
+            print(f"  [{idx+1}/10] {item['contract_id']} | {item['company_name']} ({item['name']}) -> Mine: {assigned_mine_id}")
+            
+        session.add_all(contractors_to_add)
+        await session.commit()
+        print("\n? Clean 10 unique contractors seeded successfully with no duplicates!")
 
 if __name__ == "__main__":
-    seed()
+    asyncio.run(seed())
