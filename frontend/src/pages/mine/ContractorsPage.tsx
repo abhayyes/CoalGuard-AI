@@ -119,8 +119,26 @@ export const ContractorsPage: React.FC = () => {
     }
   };
 
+  // Deduplicated & naturally sorted list by unique Contract ID
+  const uniqueContractors = React.useMemo(() => {
+    const seen = new Set<string>();
+    const list: Contractor[] = [];
+    for (const c of contractors) {
+      const idKey = c.contract_number || c.documents?.contract_id || c.id;
+      if (!seen.has(idKey)) {
+        seen.add(idKey);
+        list.push(c);
+      }
+    }
+    return list.sort((a, b) => {
+      const idA = a.contract_number || a.documents?.contract_id || '';
+      const idB = b.contract_number || b.documents?.contract_id || '';
+      return idA.localeCompare(idB, undefined, { numeric: true });
+    });
+  }, [contractors]);
+
   // Filtered list
-  const filteredContractors = contractors.filter((c, i) => {
+  const filteredContractors = uniqueContractors.filter((c, i) => {
     const q = searchQuery.toLowerCase();
     const cId = getContractId(c, i).toLowerCase();
     const cName = getContractorName(c).toLowerCase();

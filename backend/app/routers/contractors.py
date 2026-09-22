@@ -61,7 +61,7 @@ async def list_contractors(
     total = total_result.scalar_one()
 
     offset = (page - 1) * per_page
-    query = query.order_by(Contractor.name.asc()).offset(offset).limit(per_page)
+    query = query.order_by(Contractor.contract_number.asc()).offset(offset).limit(per_page)
 
     result = await db.execute(query)
     contractors = result.scalars().all()

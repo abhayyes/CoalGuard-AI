@@ -151,44 +151,48 @@ def seed():
 
     now = datetime.utcnow().isoformat()
 
-    # Populate the 10 real contractors for all active mines
-    for mine_id, mine_name in mines:
-        print(f"\nSeeding 10 contractors for mine: {mine_name} ({mine_id})")
-        for item in REAL_CONTRACTORS:
-            contractor_id = str(uuid4()).replace("-", "")
-            # Display name combines company and designated person
-            display_name = f"{item['company_name']} ({item['name']})"
-            doc_json = f'{{"company_name": "{item["company_name"]}", "contact_person": "{item["name"]}", "safety_score": {item["safety_score"]}, "license_number": "{item["license_number"]}", "contract_id": "{item["contract_id"]}"}}'
+    # Assign each of the 10 unique contractors to a mine without duplication
+    primary_mine_id = mines[0][0]
+    secondary_mine_id = mines[1][0] if len(mines) > 1 else primary_mine_id
 
-            cursor.execute(
-                """
-                INSERT INTO contractors (
-                    id, name, mine_id, contract_number, contract_start, contract_end,
-                    scope_of_work, worker_count, compliance_status, documents, is_active,
-                    created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    contractor_id,
-                    display_name,
-                    mine_id,
-                    item["contract_id"],
-                    item["start_date"],
-                    item["expiry_date"],
-                    item["scope_of_work"],
-                    item["worker_count"],
-                    item["compliance_status"],
-                    doc_json,
-                    1,
-                    now,
-                    now
-                )
+    print("\nSeeding 10 unique, non-duplicated contractors with distinct Contract IDs:")
+    for idx, item in enumerate(REAL_CONTRACTORS):
+        contractor_id = str(uuid4()).replace("-", "")
+        display_name = f"{item['company_name']} ({item['name']})"
+        doc_json = f'{{"company_name": "{item["company_name"]}", "contact_person": "{item["name"]}", "safety_score": {item["safety_score"]}, "license_number": "{item["license_number"]}", "contract_id": "{item["contract_id"]}"}}'
+
+        # Even-indexed to primary mine, odd-indexed to secondary mine, or all accessible
+        assigned_mine_id = primary_mine_id if idx % 2 == 0 else secondary_mine_id
+
+        cursor.execute(
+            """
+            INSERT INTO contractors (
+                id, name, mine_id, contract_number, contract_start, contract_end,
+                scope_of_work, worker_count, compliance_status, documents, is_active,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                contractor_id,
+                display_name,
+                assigned_mine_id,
+                item["contract_id"],
+                item["start_date"],
+                item["expiry_date"],
+                item["scope_of_work"],
+                item["worker_count"],
+                item["compliance_status"],
+                doc_json,
+                1,
+                now,
+                now
             )
-            print(f"  + Added {item['contract_id']} | {item['company_name']} ({item['name']}) | Expires: {item['expiry_date']}")
+        )
+        print(f"  [{idx+1}/10] {item['contract_id']} | {item['company_name']} ({item['name']}) -> Mine: {assigned_mine_id[:8]}... | Expires: {item['expiry_date']}")
 
     conn.commit()
     conn.close()
-    print("\n✓ Seed completed successfully!")
+    print("\n✓ Clean 10 unique contractors seeded successfully with no duplicates!")
 
 if __name__ == "__main__":
     seed()
