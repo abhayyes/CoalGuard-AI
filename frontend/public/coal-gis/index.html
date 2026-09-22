@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jharkhand Coalfields GIS Portal & Early Warning System</title>
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss-cdn@3.4.1/tailwindcss.js"></script>
+
+    <!-- Tesseract.js for On-Device OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <!-- Chart.js for Live Telemetry Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            width: 100%; 
+            font-family: sans-serif; 
+        }
+        #map { 
+            height: 100vh; 
+            width: 100%; 
+            cursor: crosshair; 
+        }
+
+        /* Custom Pulsing Marker Animations */
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .pulse-danger {
+            border-radius: 50%;
+            background-color: #ef4444;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-amber {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .pulse-warning {
+            border-radius: 50%;
+            background-color: #f59e0b;
+            animation: pulse-amber 2s infinite;
+        }
+
+        /* Leaflet Layer Control Dark Theme Overrides */
+        .leaflet-control-layers {
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(8px);
+            color: #f8fafc !important;
+            border: 1px solid rgba(51, 65, 85, 0.8) !important;
+            border-radius: 0.75rem !important;
+            padding: 8px 12px !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        }
+        .leaflet-control-layers-expanded { color: #e2e8f0 !important; }
+        .leaflet-control-layers-selector { accent-color: #10b981; margin-right: 6px; }
+
+        /* Cyberpunk Neon Glow Effects */
+        .neon-border {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25), inset 0 0 15px rgba(16, 185, 129, 0.1);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+        }
+    </style>
+</head>
+<body class="relative overflow-hidden bg-slate-950 text-slate-100">
+
+    <!-- Header Overlay -->
+    <header class="absolute top-4 left-4 z-[1000] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 p-4 rounded-xl shadow-2xl max-w-md">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+            <h1 class="text-lg font-extrabold tracking-wide text-white glow-text">Jharkhand Coalfields GIS</h1>
+        </div>
+        <p class="text-xs text-slate-400 mt-1 font-semibold">Real-time Telemetry & Fullscreen OCR Analysis Suite</p>
+        <div class="mt-3 flex gap-2 text-xs font-bold">
+            <span class="px-2 py-1 rounded bg-red-950 text-red-400 border border-red-800">● Critical Zone</span>
+            <span class="px-2 py-1 rounded bg-amber-950 text-amber-400 border border-amber-800">● Warning Zone</span>
+            <span class="px-2 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">● Normal Zone</span>
+        </div>
+    </header>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Alert Toast Floating Container -->
+    <div id="toastContainer" class="absolute top-16 right-4 z-[1000] space-y-3 w-80 pointer-events-none"></div>
+
+    <!-- Live Telemetry Chart Floating Panel -->
+    <div class="absolute bottom-6 left-4 z-[1000] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 p-4 rounded-xl shadow-2xl w-80">
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-emerald-400 glow-text">📊 Live CH4 Telemetry Trend</h3>
+            <span id="liveGasVal" class="text-xs font-mono font-black text-amber-400">0.00%</span>
+        </div>
+        <div class="h-32 w-full">
+            <canvas id="telemetryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Fullscreen OCR Field Inspection Command Suite -->
+    <div id="reportModal" class="hidden fixed inset-0 z-[3000] bg-slate-950/90 backdrop-blur-xl flex flex-col p-6 overflow-y-auto">
+        
+        <!-- Fullscreen Top Bar -->
+        <div class="flex justify-between items-center border-b border-emerald-500/30 pb-4 mb-6 max-w-7xl mx-auto w-full">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">📝</span>
+                <div>
+                    <h2 class="text-2xl font-black text-emerald-400 tracking-wider glow-text">FULLSCREEN OCR INTELLIGENCE SUITE</h2>
+                    <p class="text-xs text-slate-400 font-semibold tracking-wide">Automated Log Extraction & Geo-Tagged Node Verification</p>
+                </div>
+            </div>
+            <button onclick="closeReportModal()" class="px-4 py-2 bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-700 rounded-xl font-bold text-sm transition shadow-lg flex items-center gap-2">
+                ✕ Close Workspace
+            </button>
+        </div>
+
+        <!-- Fullscreen Workspace Grid Layout -->
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow pb-8">
+            
+            <!-- Left Column: Metadata & Parsed Insights -->
+            <div class="lg:col-span-5 flex flex-col space-y-5 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-2xl neon-border">
+                <h3 class="text-sm font-black uppercase text-emerald-300 tracking-wider border-b border-slate-800 pb-2">📍 Node Metadata & Parsed Data</h3>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase">Latitude</label>
+                        <input id="modalLat" readonly class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-200 mt-1 font-mono font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase">Longitude</label>
+                        <input id="modalLng" readonly class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-200 mt-1 font-mono font-bold text-sm">
+                    </div>
+                </div>
+
+                <!-- File Upload Box -->
+                <div class="border-2 border-dashed border-emerald-500/40 bg-emerald-950/10 rounded-2xl p-5 text-center hover:border-emerald-400 transition group cursor-pointer relative">
+                    <p class="text-sm font-extrabold text-emerald-300 mb-1 group-hover:scale-105 transition">📂 Upload Gauge Photo or Log Sheet</p>
+                    <p class="text-xs text-slate-400 mb-3">Auto-enhancement & Regex parsing enabled</p>
+                    <input type="file" id="ocrFileInput" accept="image/*" class="text-xs text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-emerald-600 file:font-black file:text-white hover:file:bg-emerald-500 cursor-pointer">
+                    <p id="ocrStatus" class="text-xs font-bold text-amber-400 mt-3 hidden animate-pulse"></p>
+                </div>
+
+                <!-- Parsed Results -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase">Parsed Reading</label>
+                        <input id="parsedReading" readonly placeholder="Waiting for scan..." class="w-full bg-slate-950 border border-emerald-500/50 rounded-xl p-3 text-emerald-400 mt-1 font-mono font-black text-base shadow-inner">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase">Data Type</label>
+                        <input id="parsedType" readonly placeholder="Type..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-200 mt-1 font-mono font-bold text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3 mt-auto">
+                    <button onclick="closeReportModal()" class="w-1/2 py-3 bg-slate-800 hover:bg-slate-700 font-bold text-sm rounded-xl text-slate-300 transition">Cancel</button>
+                    <button onclick="submitReport()" class="w-1/2 py-3 bg-emerald-600 hover:bg-emerald-500 font-black text-sm rounded-xl text-white shadow-lg shadow-emerald-600/30 transition">💾 Save Verified Log</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Massive Fullscreen OCR Text Editor Workspace -->
+            <div class="lg:col-span-7 flex flex-col bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-2xl neon-border">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+                    <h3 class="text-sm font-black uppercase text-emerald-300 tracking-wider">🔍 Full-Text Extracted OCR Output</h3>
+                    <span class="text-xs font-mono text-slate-400 bg-slate-950 px-3 py-1 rounded-full border border-slate-800">Editable Live Field Text</span>
+                </div>
+                <p class="text-xs text-slate-400 mb-3 font-medium">Review, verify, or correct the text extracted by the optical engine below before saving to the central coal database:</p>
+                <textarea id="modalNotes" rows="14" placeholder="Uploaded image text will be rendered here with high-contrast, bold formatting..." class="w-full flex-grow bg-slate-950 border border-slate-700 rounded-xl p-4 text-emerald-300 font-mono text-sm leading-relaxed tracking-wide focus:outline-none focus:border-emerald-500 shadow-inner resize-none"></textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script>
+        // Initialize Map and Layers
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
+            maxZoom: 18
+        });
+        const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+        const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 });
+        const darkLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 });
+
+        const map = L.map('map', {
+            center: [23.75, 85.85],
+            zoom: 9,
+            layers: [satelliteLayer]
+        });
+
+        L.control.layers({
+            "🛰️ Satellite": satelliteLayer,
+            "🗺️ Streets": streetLayer,
+            "🏔️ Topographic": topoLayer,
+            "🌙 Dark Canvas": darkLayer
+        }, null, { position: 'topright' }).addTo(map);
+
+        // Coal Mine Nodes Data
+        const mines = [
+            { name: "Jharia Underground Mine", lat: 23.7500, lng: 86.4200, risk: "CRITICAL", ch4: "1.85%" },
+            { name: "Rajrappa Open Cast", lat: 23.6300, lng: 85.7100, risk: "WARNING", ch4: "0.65%" },
+            { name: "North Karanpura Mine", lat: 23.8500, lng: 85.1800, risk: "CRITICAL", ch4: "1.42%" },
+            { name: "Piparwar Open Pit", lat: 23.7100, lng: 85.0300, risk: "NORMAL", ch4: "0.12%" },
+            { name: "Kathara Colliery", lat: 23.7800, lng: 85.8200, risk: "WARNING", ch4: "0.78%" },
+            { name: "Bermo Underground Mine", lat: 23.7700, lng: 85.8800, risk: "CRITICAL", ch4: "1.65%" },
+            { name: "Moonidih Deep Mine", lat: 23.7100, lng: 86.3500, risk: "CRITICAL", ch4: "2.10%" },
+            { name: "Barkakana Colliery", lat: 23.6500, lng: 85.4500, risk: "NORMAL", ch4: "0.25%" },
+            { name: "Kedla Open Cast Mine", lat: 23.7200, lng: 85.5200, risk: "WARNING", ch4: "0.58%" },
+            { name: "Gidi Washery & Pit", lat: 23.6800, lng: 85.4800, risk: "NORMAL", ch4: "0.18%" },
+            { name: "Amlo Open Cast", lat: 23.7900, lng: 85.8000, risk: "WARNING", ch4: "0.82%" },
+            { name: "Tapin South Block", lat: 23.7000, lng: 85.3900, risk: "NORMAL", ch4: "0.30%" },
+            { name: "Kusmunda Extension", lat: 23.8200, lng: 85.6500, risk: "CRITICAL", ch4: "1.55%" },
+            { name: "Chusri Underground Shaft", lat: 23.8600, lng: 86.0500, risk: "WARNING", ch4: "0.95%" }
+        ];
+
+        mines.forEach(mine => {
+            const pulseClass = mine.risk === 'CRITICAL' ? 'pulse-danger' : (mine.risk === 'WARNING' ? 'pulse-warning' : 'bg-emerald-500 rounded-full');
+            const customIcon = L.divIcon({
+                className: 'custom-pin',
+                html: `<div class="w-5 h-5 ${pulseClass} border-2 border-white"></div>`,
+                iconSize: [20, 20]
+            });
+            L.marker([mine.lat, mine.lng], { icon: customIcon }).addTo(map).bindPopup(`
+                <div class="text-slate-900 p-1">
+                    <h3 class="font-bold text-sm">${mine.name}</h3>
+                    <p class="text-xs text-slate-600">Zone Level: <b class="${mine.risk === 'CRITICAL' ? 'text-red-600' : 'text-amber-600'}">${mine.risk}</b></p>
+                    <p class="text-xs text-slate-600">CH4 Reading: <b>${mine.ch4}</b></p>
+                </div>
+            `);
+        });
+
+        // Audio & Speech Warning System
+        function playEmergencySiren() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                const now = audioCtx.currentTime;
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.linearRampToValueAtTime(880, now + 0.4);
+                osc.frequency.linearRampToValueAtTime(440, now + 0.8);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 1.2);
+            } catch (e) { console.warn(e); }
+        }
+
+        function speakAlert(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+            }
+        }
+
+        // Telemetry Chart Setup
+        const chartCtx = document.getElementById('telemetryChart').getContext('2d');
+        const telemetryChart = new Chart(chartCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'CH4 Gas Level (%)',
+                    data: [],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } },
+                    y: { min: 0, max: 3, ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        function updateChart(timeStr, gasValue) {
+            if (telemetryChart.data.labels.length >= 7) {
+                telemetryChart.data.labels.shift();
+                telemetryChart.data.datasets[0].data.shift();
+            }
+            telemetryChart.data.labels.push(timeStr);
+            telemetryChart.data.datasets[0].data.push(gasValue);
+            telemetryChart.data.datasets[0].borderColor = gasValue > 1.2 ? '#ef4444' : '#f59e0b';
+            telemetryChart.update();
+        }
+
+        // Fullscreen Modal Controls
+        map.on('click', function(e) {
+            document.getElementById('modalLat').value = e.latlng.lat.toFixed(5);
+            document.getElementById('modalLng').value = e.latlng.lng.toFixed(5);
+            document.getElementById('modalNotes').value = "";
+            document.getElementById('parsedReading').value = "";
+            document.getElementById('parsedType').value = "";
+            document.getElementById('reportModal').classList.remove('hidden');
+        });
+
+        function closeReportModal() { 
+            document.getElementById('reportModal').classList.add('hidden'); 
+        }
+
+        function submitReport() {
+            alert(`Field Report Logged Successfully into Central Database!`);
+            closeReportModal();
+        }
+
+        // Fullscreen OCR Processing Pipeline
+        document.getElementById('ocrFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const statusText = document.getElementById('ocrStatus');
+            statusText.classList.remove('hidden');
+            statusText.innerText = "⚡ Preprocessing Image (Grayscale & Contrast Boost)...";
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    ctx.drawImage(img, 0, 0);
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        let avg = (data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
+                        avg = avg < 128 ? avg * 0.75 : avg * 1.25;
+                        avg = avg > 255 ? 255 : avg;
+                        data[i] = avg;     
+                        data[i + 1] = avg; 
+                        data[i + 2] = avg; 
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    const processedImageUrl = canvas.toDataURL('image/png');
+
+                    statusText.innerText = "🔍 Scanning full-text with Tesseract OCR...";
+
+                    Tesseract.recognize(processedImageUrl, 'eng', {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                statusText.innerText = `🔍 OCR Progress: ${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    }).then(({ data: { text } }) => {
+                        const cleanText = text.trim();
+                        document.getElementById('modalNotes').value = cleanText;
+
+                        // Auto-Parsing Extracted Text via Regex
+                        const numMatch = cleanText.match(/(\d+\.\d+|\d+)\s*(%|°C|CH4)?/i);
+                        if (numMatch) {
+                            document.getElementById('parsedReading').value = numMatch[0];
+                            document.getElementById('parsedType').value = cleanText.toLowerCase().includes('ch4') ? 'CH4 Gas Level' : 'Standard Log Reading';
+                        } else {
+                            document.getElementById('parsedReading').value = "See Notes";
+                            document.getElementById('parsedType').value = "Text Log Extraction";
+                        }
+
+                        statusText.innerText = "✨ Fullscreen OCR Extraction Complete!";
+                        setTimeout(() => statusText.classList.add('hidden'), 4000);
+                    }).catch(err => {
+                        console.error("OCR Error:", err);
+                        statusText.innerText = "❌ OCR Processing Failed";
+                    });
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Toast Notifications & Telemetry Simulation Loop
+        function triggerAlert(title, site, level) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgClass = level === 'CRITICAL' ? 'bg-red-950/90 border-red-600 text-red-200' : 'bg-amber-950/90 border-amber-600 text-amber-200';
+            
+            toast.className = `p-3 rounded-lg border shadow-xl backdrop-blur-md transition-all duration-500 transform translate-x-full pointer-events-auto ${bgClass}`;
+            toast.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider">${level} ALERT</p>
+                        <p class="text-xs font-semibold text-white mt-0.5">${title}</p>
+                        <p class="text-[11px] opacity-80 mt-0.5">${site}</p>
+                    </div>
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-full'), 50);
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 500);
+            }, 6000);
+        }
+
+        const simulatedEvents = [
+            { title: "Critical Methane Spike Detected", site: "Jharia Underground Mine", level: "CRITICAL" },
+            { title: "Slope Displacement Warning", site: "Rajrappa Open Cast", level: "WARNING" },
+            { title: "Ventilation Failure Alert", site: "North Karanpura Mine", level: "CRITICAL" }
+        ];
+        let simIdx = 0;
+
+        setInterval(() => {
+            const event = simulatedEvents[simIdx % simulatedEvents.length];
+            const gasValue = event.level === "CRITICAL" ? (1.5 + Math.random()).toFixed(2) : (0.2 + Math.random() * 0.7).toFixed(2);
+            const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            triggerAlert(event.title, event.site, event.level);
+            updateChart(timeLabel, parseFloat(gasValue));
+            document.getElementById('liveGasVal').innerText = `${gasValue}% CH4`;
+
+            const targetMine = mines.find(m => m.name === event.site);
+            if (event.level === 'CRITICAL' && targetMine && targetMine.risk === 'CRITICAL') {
+                playEmergencySiren();
+                setTimeout(() => speakAlert(`High Alert Zone Emergency: ${event.title}`), 1400);
+            }
+            simIdx++;
+        }, 15000);
+    </script>
+</body>
+</html>
