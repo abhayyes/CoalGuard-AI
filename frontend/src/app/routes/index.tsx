@@ -18,6 +18,7 @@ import { ContractorsPage } from '../../pages/mine/ContractorsPage';
 import { AlertsPage } from '../../pages/mine/AlertsPage';
 import { DocumentsPage } from '../../pages/mine/DocumentsPage';
 import { RiskDashboardPage } from '../../pages/RiskDashboardPage';
+import { CoalGisPage } from '../../pages/mine/CoalGisPage';
 
 // Admin Pages
 import { AdminDashboardPage } from '../../pages/admin/AdminDashboardPage';
@@ -57,6 +58,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/mine/alerts" element={<AlertsPage />} />
         <Route path="/mine/documents" element={<DocumentsPage />} />
         <Route path="/mine/risk" element={<RiskDashboardPage />} />
+        <Route path="/mine/gis" element={<CoalGisPage />} />
+        <Route path="/mine/map" element={<CoalGisPage />} />
 
         {/* Corporate Routes */}
         <Route
@@ -72,6 +75,14 @@ export const AppRoutes: React.FC = () => {
           element={
             <ProtectedRoute allowedRoles={['corporate', 'admin', 'regulatory']}>
               <CorporateReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/corporate/gis"
+          element={
+            <ProtectedRoute allowedRoles={['corporate', 'admin', 'regulatory']}>
+              <CoalGisPage />
             </ProtectedRoute>
           }
         />
@@ -119,4 +130,5 @@ export const AppRoutes: React.FC = () => {
     </Routes>
   );
 };
+
 

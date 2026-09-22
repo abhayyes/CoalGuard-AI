@@ -11,6 +11,7 @@ import {
   Layers,
   FileCheck,
   Sparkles,
+  Compass,
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { cn } from '../../lib/utils';
@@ -48,29 +49,30 @@ export const Sidebar: React.FC = () => {
   const role = user?.role || 'mine_official';
 
   const mineNavItems = [
-    { to: '/mine/dashboard',    label: 'Dashboard',         icon: LayoutDashboard },
-    { to: '/mine/compliance',   label: 'Compliance',        icon: CheckSquare },
-    { to: '/mine/inspections',  label: 'Inspections',       icon: ClipboardList },
-    { to: '/mine/observations', label: 'Observations',      icon: AlertTriangle },
-    { to: '/mine/contractors',  label: 'Contractors',       icon: Users },
-    { to: '/mine/documents',    label: 'Documents & OCR',   icon: FileText },
-    { to: '/mine/alerts',       label: 'Alerts',            icon: Shield },
-    { to: '/mine/risk',         label: 'Risk & Safety',     icon: Shield },
-  ];
+    { to: '/mine/dashboard',    label: 'Dashboard',             icon: LayoutDashboard },
+    { to: '/mine/gis',          label: 'Coal GIS & Warning',    icon: Compass },
+    { to: '/mine/risk',         label: 'Risk & Safety',         icon: Shield },
+    { to: '/mine/compliance',   label: 'Compliance',            icon: CheckSquare },
+    { to: '/mine/inspections',  label: 'Inspections',           icon: ClipboardList },
+    { to: '/mine/observations', label: 'Observations',          icon: AlertTriangle },
+    { to: '/mine/contractors',  label: 'Contractors',           icon: Users },
+    { to: '/mine/documents',    label: 'Documents & OCR',       icon: FileText },
+    { to: '/mine/alerts',       label: 'Alerts',                icon: Shield },];
 
   const adminNavItems = [
-    { to: '/admin/dashboard',   label: 'Admin Overview',    icon: LayoutDashboard },
-    { to: '/admin/users',       label: 'User Directory',    icon: Users },
-    { to: '/admin/mines',       label: 'Mine Config',       icon: Layers },
-    { to: '/admin/audit-log',   label: 'Audit Trail',       icon: FileCheck },
+    { to: '/admin/dashboard',   label: 'Admin Overview',        icon: LayoutDashboard },
+    { to: '/admin/users',       label: 'User Directory',        icon: Users },
+    { to: '/admin/mines',       label: 'Mine Config',           icon: Layers },
+    { to: '/admin/audit-log',   label: 'Audit Trail',           icon: FileCheck },
   ];
 
   const corporateNavItems = [
-    { to: '/corporate/dashboard', label: 'National Dashboard', icon: LayoutDashboard },
-    { to: '/corporate/reports',   label: 'Executive Reports',  icon: FileText },
+    { to: '/corporate/dashboard', label: 'National Dashboard',   icon: LayoutDashboard },
+    { to: '/corporate/gis',       label: 'Coalfields GIS Map',   icon: Compass },
+    { to: '/corporate/reports',   label: 'Executive Reports',    icon: FileText },
   ];
 
-  const delays = ['delay-75', 'delay-100', 'delay-150', 'delay-200', 'delay-300', 'delay-400', 'delay-500'];
+  const delays = ['delay-75', 'delay-100', 'delay-150', 'delay-200', 'delay-300', 'delay-400', 'delay-500', 'delay-500', 'delay-500'];
 
   return (
     <aside className="w-64 flex-shrink-0 min-h-screen flex flex-col relative overflow-hidden"
@@ -148,4 +150,5 @@ export const Sidebar: React.FC = () => {
     </aside>
   );
 };
+
 
