@@ -17,6 +17,7 @@ import { ObservationsPage } from '../../pages/mine/ObservationsPage';
 import { ContractorsPage } from '../../pages/mine/ContractorsPage';
 import { AlertsPage } from '../../pages/mine/AlertsPage';
 import { DocumentsPage } from '../../pages/mine/DocumentsPage';
+import { RiskDashboardPage } from '../../pages/RiskDashboardPage';
 
 // Admin Pages
 import { AdminDashboardPage } from '../../pages/admin/AdminDashboardPage';
@@ -55,6 +56,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/mine/contractors" element={<ContractorsPage />} />
         <Route path="/mine/alerts" element={<AlertsPage />} />
         <Route path="/mine/documents" element={<DocumentsPage />} />
+        <Route path="/mine/risk" element={<RiskDashboardPage />} />
 
         {/* Corporate Routes */}
         <Route
