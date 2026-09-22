@@ -12,6 +12,7 @@ from . import (
     mines,
     observations,
     reports,
+    telemetry,
     users,
 )
 
@@ -28,4 +29,5 @@ __all__ = [
     "documents",
     "reports",
     "audit_log",
+    "telemetry",
 ]

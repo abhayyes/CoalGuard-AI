@@ -3,11 +3,13 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
-from fastapi import FastAPI
+from typing import Any
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine, Base
+from app.services.ai_client import ai_client
 from app.routers import (
     auth,
     users,
@@ -22,7 +24,8 @@ from app.routers import (
     reports,
     audit_log,
     assistant,
-ai_proxy,
+    ai_proxy,
+    telemetry,
 )
 
 
@@ -68,10 +71,18 @@ app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(audit_log.router, prefix="/api/audit-log", tags=["Audit Log"])
 app.include_router(assistant.router, prefix="/api/assistant", tags=["Assistant"])
 app.include_router(ai_proxy.router, prefix="/api/ai", tags=["AI Service"])
+app.include_router(telemetry.router, prefix="/api/telemetry", tags=["Telemetry"])
 
 
 @app.get("/api/health")
 async def health_check() -> dict[str, str]:
     return {"status": "healthy", "service": "coalguard-ai"}
+
+
+@app.post("/predict", tags=["Prediction"])
+@app.post("/api/predict", tags=["Prediction"])
+async def predict_endpoint(payload: dict[str, Any] = Body(default_factory=dict)) -> dict[str, Any]:
+    """Prediction API endpoint for real-time risk assessment and makePrediction() integration."""
+    return await ai_client.predict_risk(payload)
 
 
