@@ -64,7 +64,7 @@ export interface TelemetryServiceOptions {
   onStateChange?: (state: ConnectionState, errorMsg?: string) => void;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE = import.meta.env.DEV ? 'http://localhost:10002/api' : 'https://coalguard-backend.onrender.com/api';
 
 class TelemetryService {
   private eventSource: EventSource | null = null;
